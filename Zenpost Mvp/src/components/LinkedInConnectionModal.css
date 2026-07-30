@@ -1,0 +1,349 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideUp 0.3s ease-out;
+}
+
+.linkedin-modal {
+  max-width: 550px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.modal-close:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.modal-close svg {
+  width: 20px;
+  height: 20px;
+  stroke: #6b7280;
+}
+
+.modal-step {
+  padding: 40px;
+}
+
+.linkedin-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 102, 194, 0.1);
+  border-radius: 16px;
+}
+
+.linkedin-icon svg {
+  width: 40px;
+  height: 40px;
+}
+
+.modal-step h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  text-align: center;
+}
+
+.modal-description {
+  color: #6b7280;
+  text-align: center;
+  margin: 0 0 24px 0;
+  line-height: 1.6;
+}
+
+.modal-note {
+  color: #9ca3af;
+  font-size: 13px;
+  text-align: center;
+  margin: 16px 0 0 0;
+}
+
+.error-message {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  color: #dc2626;
+  font-size: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.error-message svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Account Selection */
+.accounts-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.account-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: #f9fafb;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.account-option:hover {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+}
+
+.account-option.selected {
+  background: rgba(124, 58, 237, 0.05);
+  border-color: var(--accent-purple-light);
+}
+
+.account-option-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.account-option-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.account-option-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.account-option-avatar svg {
+  width: 24px;
+  height: 24px;
+  stroke: #9ca3af;
+}
+
+.account-option-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.account-option-name {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-option-type {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.account-option-checkbox {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #d1d5db;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.account-option.selected .account-option-checkbox {
+  background: var(--accent-purple-light);
+  border-color: var(--accent-purple-light);
+}
+
+.account-option-checkbox svg {
+  width: 16px;
+  height: 16px;
+  stroke: white;
+}
+
+.no-companies-message {
+  text-align: center;
+  padding: 32px 16px;
+  color: #6b7280;
+}
+
+.no-companies-message p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.modal-actions .btn {
+  flex: 1;
+}
+
+/* Success Step */
+.success-step {
+  text-align: center;
+}
+
+.success-step .success-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: 700;
+  animation: scaleIn 0.5s ease-out;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Spinner */
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .modal-content {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .modal-step {
+    padding: 32px 24px;
+  }
+
+  .linkedin-icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 20px;
+  }
+
+  .linkedin-icon svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .modal-step h2 {
+    font-size: 20px;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .modal-actions .btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,60 @@
+/* Platform Icon Component Styles */
+
+.platform-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.platform-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.platform-icon-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Size variants */
+.platform-icon-small {
+  width: 16px;
+  height: 16px;
+}
+
+.platform-icon-medium {
+  width: 24px;
+  height: 24px;
+}
+
+.platform-icon-large {
+  width: 32px;
+  height: 32px;
+}
+
+/* Optional hover effect */
+.platform-icon-container:hover {
+  transform: scale(1.1);
+}
+
+/* Platform label */
+.platform-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* Utility classes for different contexts */
+.platform-icon-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.platform-icon-badge .platform-icon-container {
+  width: 18px;
+  height: 18px;
+}

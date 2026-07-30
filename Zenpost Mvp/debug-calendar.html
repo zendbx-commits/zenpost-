@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Calendar Debug Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #6366f1;
+        }
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #4f46e5;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f9ff;
+            border-left: 4px solid #6366f1;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .error {
+            background: #fee2e2;
+            border-left-color: #ef4444;
+        }
+        .success {
+            background: #d1fae5;
+            border-left-color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛠️ Content Calendar Debug Tool</h1>
+        <p>Use this tool to diagnose issues with the Content Calendar</p>
+        
+        <div>
+            <button onclick="checkBackend()">1. Check Backend Connection</button>
+            <button onclick="checkAuth()">2. Check Authentication</button>
+            <button onclick="fetchPosts()">3. Fetch Scheduled Posts</button>
+            <button onclick="checkLocalStorage()">4. Check LocalStorage</button>
+            <button onclick="addSamplePost()">5. Add Sample Post</button>
+        </div>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8001';
+        
+        function showResult(message, type = 'result') {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+        }
+
+        async function checkBackend() {
+            showResult('Checking backend connection...');
+            try {
+                const response = await fetch(`${API_BASE_URL}/docs`);
+                if (response.ok) {
+                    showResult('✅ Backend is running!\n\nBackend URL: ' + API_BASE_URL + '\nStatus: Connected', 'success');
+                } else {
+                    showResult('⚠️ Backend responded but with status: ' + response.status, 'error');
+                }
+            } catch (error) {
+                showResult('❌ Cannot connect to backend!\n\nError: ' + error.message + '\n\nMake sure the backend is running on ' + API_BASE_URL, 'error');
+            }
+        }
+
+        async function checkAuth() {
+            showResult('Checking authentication...');
+            
+            // This is a simplified check - in the real app, you'd use zendbx
+            const user = localStorage.getItem('zenpost_user');
+            const session = localStorage.getItem('zenpost_session');
+            
+            if (user || session) {
+                showResult('✅ User session found!\n\n' + 
+                    'User data exists in localStorage\n' +
+                    'Keys: ' + Object.keys(localStorage).filter(k => k.includes('zenpost')).join(', '), 'success');
+            } else {
+                showResult('⚠️ No user session found!\n\nYou may need to log in first.\n\nZenPost keys in localStorage: ' + 
+                    Object.keys(localStorage).filter(k => k.includes('zenpost')).join(', '), 'error');
+            }
+        }
+
+        async function fetchPosts() {
+            showResult('Fetching scheduled posts from backend...');
+            
+            try {
+                // Get user ID from localStorage (you might need to adjust this)
+                const userKeys = Object.keys(localStorage).filter(k => k.includes('zenpost'));
+                let userId = 'test-user'; // Default fallback
+                
+                showResult('Attempting to fetch posts...\n\nAPI URL: ' + API_BASE_URL + '/api/scheduled-posts?user_id=' + userId);
+                
+                const response = await fetch(`${API_BASE_URL}/api/scheduled-posts?user_id=${userId}`);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    showResult('❌ Failed to fetch posts!\n\nStatus: ' + response.status + '\nError: ' + errorText, 'error');
+                    return;
+                }
+                
+                const data = await response.json();
+                showResult('✅ Posts fetched successfully!\n\n' + JSON.stringify(data, null, 2), 'success');
+                
+                if (data.posts && data.posts.length === 0) {
+                    showResult('⚠️ No posts found in database!\n\nThe calendar is empty because there are no scheduled posts.\n\nTo fix this:\n1. Go to Marketing Intelligence\n2. Analyze a website\n3. Approve and schedule the generated posts', 'error');
+                }
+            } catch (error) {
+                showResult('❌ Error fetching posts!\n\nError: ' + error.message + '\n\nMake sure:\n1. Backend is running\n2. Database is set up correctly', 'error');
+            }
+        }
+
+        function checkLocalStorage() {
+            showResult('Checking localStorage for posts...');
+            
+            const allKeys = Object.keys(localStorage);
+            const zenpostKeys = allKeys.filter(k => k.includes('zenpost') || k.includes('scheduled'));
+            
+            if (zenpostKeys.length === 0) {
+                showResult('⚠️ No ZenPost data in localStorage!\n\nLocalStorage is empty.', 'error');
+                return;
+            }
+            
+            let output = '📦 LocalStorage Contents:\n\n';
+            
+            zenpostKeys.forEach(key => {
+                const value = localStorage.getItem(key);
+                output += `Key: ${key}\n`;
+                
+                try {
+                    const parsed = JSON.parse(value);
+                    output += `Value: ${JSON.stringify(parsed, null, 2)}\n\n`;
+                } catch {
+                    output += `Value: ${value.substring(0, 100)}${value.length > 100 ? '...' : ''}\n\n`;
+                }
+            });
+            
+            showResult(output, 'success');
+        }
+
+        async function addSamplePost() {
+            showResult('Adding sample post to localStorage...');
+            
+            const today = new Date();
+            const samplePost = {
+                id: 'sample-' + Date.now(),
+                date: today.toISOString().split('T')[0],
+                time: '10:00',
+                platform: 'LinkedIn',
+                platforms: ['LinkedIn'],
+                type: 'Image',
+                status: 'scheduled',
+                title: 'Sample Post - Test Your Calendar',
+                caption: 'This is a sample post to test your content calendar. You can delete this later.',
+                hook: 'Testing the calendar functionality',
+                call_to_action: 'Check if the calendar works!',
+                hashtags: ['#test', '#sample', '#zenpost'],
+                campaign_id: null
+            };
+            
+            // Get existing posts or create new array
+            let posts = [];
+            const userId = 'test-user';
+            const savedPosts = localStorage.getItem(`zenpost_scheduled_posts_${userId}`);
+            
+            if (savedPosts) {
+                posts = JSON.parse(savedPosts);
+            }
+            
+            posts.push(samplePost);
+            localStorage.setItem(`zenpost_scheduled_posts_${userId}`, JSON.stringify(posts));
+            
+            showResult('✅ Sample post added!\n\n' + JSON.stringify(samplePost, null, 2) + 
+                '\n\nNow refresh your Content Calendar page to see it!', 'success');
+        }
+    </script>
+</body>
+</html>

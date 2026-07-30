@@ -1,0 +1,39 @@
+/* Modern Landing Page Styles */
+.landing-modern {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.landing-modern-hero {
+  padding: 100px 20px;
+  text-align: center;
+  color: white;
+}
+
+.landing-modern-hero h1 {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.landing-modern-hero p {
+  font-size: 20px;
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
+
+.landing-modern-cta {
+  display: inline-block;
+  padding: 15px 40px;
+  background: white;
+  color: #667eea;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+
+.landing-modern-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}

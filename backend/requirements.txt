@@ -1,0 +1,28 @@
+# FastAPI Framework
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+pydantic==2.9.2
+python-multipart==0.0.12
+
+# HTTP Client
+httpx==0.28.1
+aiohttp==3.10.10
+
+# Environment Variables
+python-dotenv==1.0.1
+
+# Web Scraping & Content Extraction
+trafilatura==1.12.2
+beautifulsoup4==4.12.3
+lxml==5.3.0
+validators==0.34.0
+
+# AI/ML - Text Generation
+groq==0.13.0
+openai==1.54.0
+
+# AI/ML - Image Generation (Stability AI)
+Pillow
+
+# LinkedIn OAuth & API
+requests-oauthlib==2.0.0

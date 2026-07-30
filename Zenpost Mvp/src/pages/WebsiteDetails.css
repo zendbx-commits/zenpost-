@@ -1,0 +1,211 @@
+.website-details-page {
+  padding-top: 5rem;
+  min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.website-favicon-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 1rem;
+  background: var(--gradient-purple);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.website-url-large {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--accent-purple-light);
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.website-url-large svg {
+  width: 16px;
+  height: 16px;
+}
+
+.website-url-large:hover {
+  color: var(--accent-purple);
+}
+
+.website-status-large {
+  padding: 0.5rem 1.5rem;
+  border-radius: 2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.metric-card {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.metric-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.metric-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.metric-info {
+  flex: 1;
+}
+
+.metric-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  margin-bottom: 0.25rem;
+}
+
+.metric-value {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.details-card {
+  padding: 2rem;
+}
+
+.details-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.details-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.detail-label {
+  font-size: 0.9rem;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  text-align: right;
+  font-weight: 500;
+}
+
+.detail-link {
+  color: var(--accent-purple-light);
+  transition: color 0.3s ease;
+}
+
+.detail-link:hover {
+  color: var(--accent-purple);
+}
+
+.description-text {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.activity-section {
+  padding: 2rem;
+}
+
+.empty-activity {
+  text-align: center;
+  padding: 3rem;
+}
+
+.empty-icon-small {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1rem;
+  color: var(--text-tertiary);
+}
+
+.empty-text {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 968px) {
+  .header-left {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .website-favicon-large {
+    width: 64px;
+    height: 64px;
+    font-size: 2rem;
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

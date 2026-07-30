@@ -1,0 +1,630 @@
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import zendbx from '../lib/zendbx'
+import LinkedInConnectionModal from '../components/LinkedInConnectionModal'
+import TwitterConnectionModal from '../components/TwitterConnectionModal'
+import FacebookConnectionModal from '../components/FacebookConnectionModal'
+import InstagramConnectionModal from '../components/InstagramConnectionModal'
+import PinterestConnectionModal from '../components/PinterestConnectionModal'
+import ThreadsConnectionModal from '../components/ThreadsConnectionModal'
+import './SocialAccounts.css'
+
+const SocialAccounts = () => {
+  const navigate = useNavigate()
+  const [connectedAccounts, setConnectedAccounts] = useState([])
+  const [connectingPlatform, setConnectingPlatform] = useState(null)
+  const [userId, setUserId] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [showLinkedInModal, setShowLinkedInModal] = useState(false)
+  const [showTwitterModal, setShowTwitterModal] = useState(false)
+  const [showFacebookModal, setShowFacebookModal] = useState(false)
+  const [showInstagramModal, setShowInstagramModal] = useState(false)
+  const [showPinterestModal, setShowPinterestModal] = useState(false)
+  const [showThreadsModal, setShowThreadsModal] = useState(false)
+
+  const platforms = [
+    {
+      id: 'linkedin',
+      name: 'LinkedIn',
+      color: '#0A66C2',
+      icon: (
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+        </svg>
+      ),
+      description: 'Connect your LinkedIn profile or company page'
+    },
+    {
+      id: 'twitter',
+      name: 'X (Twitter)',
+      color: '#000000',
+      icon: (
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+        </svg>
+      ),
+      description: 'Connect your X (formerly Twitter) account'
+    },
+    {
+      id: 'facebook',
+      name: 'Facebook',
+      color: '#1877F2',
+      icon: (
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+        </svg>
+      ),
+      description: 'Connect your Facebook page or profile'
+    },
+    {
+      id: 'instagram',
+      name: 'Instagram',
+      color: '#E4405F',
+      icon: (
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"/>
+        </svg>
+      ),
+      description: 'Connect your Instagram business account'
+    },
+    {
+      id: 'threads',
+      name: 'Threads',
+      color: '#000000',
+      icon: (
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 013.02.142l-.126 1.974a11.9 11.9 0 00-2.64-.119c-1.06.061-1.98.396-2.6.945-.63.56-.94 1.268-.896 2.05.046.813.436 1.491 1.13 1.963.563.385 1.27.57 2.1.537 1.187-.05 2.064-.48 2.694-1.318.423-.563.684-1.27.773-2.102.007-.065.011-.133.013-.2.03-.874-.257-1.657-.844-2.27-.61-.638-1.52-1.01-2.64-1.08a8.124 8.124 0 00-.926-.03c-2.383.03-4.33.773-5.645 2.154-.973 1.023-1.535 2.33-1.628 3.787-.1 1.548.285 2.96 1.113 4.087.794.955 1.903 1.637 3.301 2.032 1.168.33 2.484.462 3.912.392 1.976-.096 3.646-.835 4.964-2.196 1.442-1.49 2.28-3.523 2.49-6.039.06-.69.09-1.39.09-2.084 0-2.606-.547-4.62-1.628-5.986-1.088-1.377-2.78-2.13-5.033-2.24-3.218.11-5.502 1.424-6.792 3.913-.63 1.215-.95 2.603-1.002 4.137v.007c.002.083.006.165.01.248.044 1.15.255 2.186.63 3.091.357.867.858 1.608 1.49 2.205.628.6 1.384 1.054 2.245 1.355.86.3 1.813.451 2.832.451a10.414 10.414 0 003.43-.577l.636 1.898c-1.246.434-2.637.651-4.135.651-1.356 0-2.577-.191-3.631-.569-1.058-.379-1.983-.94-2.754-1.667-.77-.726-1.37-1.619-1.784-2.658-.414-1.04-.636-2.196-.668-3.444-.004-.114-.007-.227-.01-.34v-.007c.063-1.81.455-3.468 1.165-4.93 1.565-3.214 4.485-4.982 8.685-5.114 2.745.132 4.897 1.087 6.4 2.843 1.343 1.57 2.024 3.853 2.024 6.783 0 .772-.03 1.544-.09 2.297-.24 2.863-1.235 5.227-2.961 7.036-1.636 1.714-3.736 2.654-6.242 2.791-.42.023-.838.034-1.254.034z"/>
+        </svg>
+      ),
+      description: 'Connect your Threads account'
+    },
+    {
+      id: 'pinterest',
+      name: 'Pinterest',
+      color: '#E60023',
+      icon: (
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/>
+        </svg>
+      ),
+      description: 'Connect your Pinterest account'
+    },
+    {
+      id: 'reddit',
+      name: 'Reddit',
+      color: '#FF4500',
+      icon: (
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
+        </svg>
+      ),
+      description: 'Connect your Reddit account'
+    }
+  ]
+
+  useEffect(() => {
+    checkAuthAndLoadAccounts()
+  }, [navigate])
+
+  const checkAuthAndLoadAccounts = async () => {
+    try {
+      const user = await zendbx.auth.getUser()
+      if (!user || !user.id) {
+        navigate('/login')
+        return
+      }
+      setUserId(user.id)
+      await loadConnectedAccounts(user.id)
+    } catch (error) {
+      console.error('Auth error:', error)
+      navigate('/login')
+    }
+  }
+
+  const loadConnectedAccounts = async (userId) => {
+    try {
+      // Fetch all social accounts and filter client-side
+      const response = await zendbx
+        .from('socials')
+        .select('*')
+
+      console.log('Raw social accounts response:', response)
+
+      // Handle the response based on what we get
+      let allAccounts = []
+      if (response && response.data) {
+        allAccounts = response.data
+      } else if (Array.isArray(response)) {
+        allAccounts = response
+      }
+
+      // Filter for current user and sort by created_at descending
+      const userAccounts = allAccounts
+        .filter(acc => acc.user_id === userId)
+        .sort((a, b) => {
+          const dateA = new Date(a.created_at || a.connected_at || 0)
+          const dateB = new Date(b.created_at || b.connected_at || 0)
+          return dateB - dateA
+        })
+
+      console.log('Filtered user accounts:', userAccounts)
+      
+      // Debug: Log each account's is_active status
+      userAccounts.forEach(acc => {
+        console.log(`Account ${acc.account_name}: is_active =`, acc.is_active, typeof acc.is_active)
+      })
+      
+      setConnectedAccounts(userAccounts)
+    } catch (error) {
+      console.error('Error loading accounts:', error)
+      setConnectedAccounts([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleConnect = async (platform) => {
+    // LinkedIn uses OAuth flow
+    if (platform.id === 'linkedin') {
+      setShowLinkedInModal(true)
+      return
+    }
+
+    // Twitter uses OAuth flow
+    if (platform.id === 'twitter') {
+      setShowTwitterModal(true)
+      return
+    }
+
+    // Facebook uses OAuth flow
+    if (platform.id === 'facebook') {
+      setShowFacebookModal(true)
+      return
+    }
+
+    // Instagram uses OAuth flow
+    if (platform.id === 'instagram') {
+      setShowInstagramModal(true)
+      return
+    }
+
+    // Pinterest uses OAuth flow
+    if (platform.id === 'pinterest') {
+      setShowPinterestModal(true)
+      return
+    }
+
+    // Threads uses OAuth flow
+    if (platform.id === 'threads') {
+      setShowThreadsModal(true)
+      return
+    }
+
+    // Other platforms - simulate OAuth (to be implemented later)
+    setConnectingPlatform(platform.id)
+    
+    setTimeout(async () => {
+      const username = prompt(`Enter your ${platform.name} username/handle:`)
+      
+      if (username && userId) {
+        try {
+          const response = await zendbx
+            .from('socials')
+            .insert({
+              user_id: userId,
+              platform: platform.id,
+              platform_name: platform.name,
+              username: username,
+              followers: Math.floor(Math.random() * 10000),
+              posts: Math.floor(Math.random() * 500),
+              status: 'active'
+            })
+            .select()
+
+          console.log('Social account response:', response)
+
+          // Handle response
+          let newAccount = null
+          if (response && response.data && response.data.length > 0) {
+            newAccount = response.data[0]
+          } else if (response && response.id) {
+            newAccount = response
+          }
+
+          if (newAccount) {
+            setConnectedAccounts([...connectedAccounts, newAccount])
+          }
+        } catch (error) {
+          console.error('Error connecting account:', error)
+          alert('Failed to connect account. Please try again.')
+        }
+      }
+      
+      setConnectingPlatform(null)
+    }, 1500)
+  }
+
+  const handleLinkedInConnect = async (accounts) => {
+    // Add newly connected LinkedIn accounts to the list
+    const formattedAccounts = accounts.map(acc => ({
+      id: `${acc.account_id}-${Date.now()}`,
+      user_id: acc.user_id,
+      platform: 'linkedin',
+      platform_name: 'LinkedIn',
+      username: acc.username,
+      followers: acc.followers,
+      posts: acc.posts,
+      status: acc.status,
+      connected_at: new Date().toISOString()
+    }))
+    
+    setConnectedAccounts([...connectedAccounts, ...formattedAccounts])
+    setShowLinkedInModal(false)
+  }
+
+  const handleTwitterConnect = async (accounts) => {
+    // Add newly connected Twitter accounts to the list
+    const formattedAccounts = accounts.map(acc => ({
+      id: acc.id || `twitter-${Date.now()}`,
+      user_id: acc.user_id,
+      platform: 'twitter',
+      platform_name: 'X (Twitter)',
+      username: acc.username,
+      followers: acc.followers,
+      posts: acc.posts,
+      status: acc.status,
+      connected_at: new Date().toISOString()
+    }))
+    
+    setConnectedAccounts([...connectedAccounts, ...formattedAccounts])
+    setShowTwitterModal(false)
+  }
+
+  const handleFacebookConnect = async (accounts) => {
+    // Add newly connected Facebook accounts to the list
+    const formattedAccounts = accounts.map(acc => ({
+      id: acc.id || `facebook-${Date.now()}`,
+      user_id: acc.user_id,
+      platform: acc.platform || 'facebook',
+      platform_name: acc.platform_name || 'Facebook',
+      username: acc.username,
+      followers: acc.followers,
+      posts: acc.posts,
+      status: acc.status,
+      connected_at: new Date().toISOString()
+    }))
+    
+    setConnectedAccounts([...connectedAccounts, ...formattedAccounts])
+    setShowFacebookModal(false)
+  }
+
+  const handleInstagramConnect = async (accounts) => {
+    // Add newly connected Instagram accounts to the list
+    const formattedAccounts = accounts.map(acc => ({
+      id: acc.id || `instagram-${Date.now()}`,
+      user_id: acc.user_id,
+      platform: acc.platform || 'instagram',
+      platform_name: acc.platform_name || 'Instagram',
+      username: acc.username,
+      followers: acc.followers,
+      posts: acc.posts,
+      status: acc.status,
+      connected_at: new Date().toISOString()
+    }))
+    
+    setConnectedAccounts([...connectedAccounts, ...formattedAccounts])
+    setShowInstagramModal(false)
+  }
+
+  const handlePinterestConnect = async (accounts) => {
+    // Add newly connected Pinterest accounts to the list
+    const formattedAccounts = accounts.map(acc => ({
+      id: acc.id || `pinterest-${Date.now()}`,
+      user_id: acc.user_id,
+      platform: acc.platform || 'pinterest',
+      platform_name: acc.platform_name || 'Pinterest',
+      username: acc.username,
+      followers: acc.followers,
+      posts: acc.posts,
+      status: acc.status,
+      connected_at: new Date().toISOString()
+    }))
+    
+    setConnectedAccounts([...connectedAccounts, ...formattedAccounts])
+    setShowPinterestModal(false)
+  }
+
+  const handleThreadsConnect = async (accounts) => {
+    // Add newly connected Threads accounts to the list
+    const formattedAccounts = accounts.map(acc => ({
+      id: acc.id || `threads-${Date.now()}`,
+      user_id: acc.user_id,
+      platform: acc.platform || 'threads',
+      platform_name: acc.platform_name || 'Threads',
+      username: acc.username,
+      followers: acc.followers,
+      posts: acc.posts,
+      status: acc.status,
+      connected_at: new Date().toISOString()
+    }))
+    
+    setConnectedAccounts([...connectedAccounts, ...formattedAccounts])
+    setShowThreadsModal(false)
+  }
+
+  const handleDisconnect = async (accountId) => {
+    if (window.confirm('Are you sure you want to disconnect this account?')) {
+      try {
+        const { error } = await zendbx
+          .from('socials')
+          .delete()
+          .eq('id', accountId)
+
+        if (error) throw error
+
+        setConnectedAccounts(connectedAccounts.filter(acc => acc.id !== accountId))
+      } catch (error) {
+        console.error('Error disconnecting account:', error)
+        alert('Failed to disconnect account. Please try again.')
+      }
+    }
+  }
+
+  const getAccountByPlatform = (platformId) => {
+    return connectedAccounts.find(acc => acc.platform === platformId)
+  }
+
+  const getPlatformColor = (platformId) => {
+    return platforms.find(p => p.id === platformId)?.color || '#7c3aed'
+  }
+
+  if (loading) {
+    return (
+      <div className="social-accounts-page">
+        <div className="container">
+          <p>Loading accounts...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="social-accounts-page">
+      {/* LinkedIn Connection Modal */}
+      <LinkedInConnectionModal
+        isOpen={showLinkedInModal}
+        onClose={() => setShowLinkedInModal(false)}
+        onConnect={handleLinkedInConnect}
+        userId={userId}
+      />
+
+      {/* Twitter Connection Modal */}
+      <TwitterConnectionModal
+        isOpen={showTwitterModal}
+        onClose={() => setShowTwitterModal(false)}
+        onConnect={handleTwitterConnect}
+        userId={userId}
+      />
+
+      {/* Facebook Connection Modal */}
+      <FacebookConnectionModal
+        isOpen={showFacebookModal}
+        onClose={() => setShowFacebookModal(false)}
+        onConnect={handleFacebookConnect}
+        userId={userId}
+      />
+
+      {/* Instagram Connection Modal */}
+      <InstagramConnectionModal
+        isOpen={showInstagramModal}
+        onClose={() => setShowInstagramModal(false)}
+        onConnect={handleInstagramConnect}
+        userId={userId}
+      />
+
+      {/* Pinterest Connection Modal */}
+      <PinterestConnectionModal
+        isOpen={showPinterestModal}
+        onClose={() => setShowPinterestModal(false)}
+        onConnect={handlePinterestConnect}
+        userId={userId}
+      />
+
+      {/* Threads Connection Modal */}
+      <ThreadsConnectionModal
+        isOpen={showThreadsModal}
+        onClose={() => setShowThreadsModal(false)}
+        onConnect={handleThreadsConnect}
+        userId={userId}
+      />
+
+      {/* Header */}
+      <div className="page-header">
+        <div className="container">
+          <div className="header-content">
+            <div className="header-text">
+              <h1 className="page-title">
+                <span className="gradient-text">Social Accounts</span>
+              </h1>
+              <p className="page-subtitle">
+                Connect and manage your social media accounts
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="page-content">
+        <div className="container">
+          {/* Stats Overview */}
+          {connectedAccounts.length > 0 && (
+            <div className="stats-overview">
+              <div className="stat-card card">
+                <div className="stat-icon" style={{ background: 'rgba(124, 58, 237, 0.1)', color: 'var(--accent-purple-light)' }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
+                </div>
+                <div className="stat-info">
+                  <div className="stat-label">Connected Accounts</div>
+                  <div className="stat-value">{connectedAccounts.length}</div>
+                </div>
+              </div>
+
+              <div className="stat-card card">
+                <div className="stat-icon" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <div className="stat-info">
+                  <div className="stat-label">Total Followers</div>
+                  <div className="stat-value">
+                    {connectedAccounts.reduce((sum, acc) => sum + (Number(acc.followers) || 0), 0).toLocaleString()}
+                  </div>
+                </div>
+              </div>
+
+              <div className="stat-card card">
+                <div className="stat-icon" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <div className="stat-info">
+                  <div className="stat-label">Total Posts</div>
+                  <div className="stat-value">
+                    {connectedAccounts.reduce((sum, acc) => sum + (Number(acc.posts) || 0), 0)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Connected Accounts */}
+          {connectedAccounts.length > 0 && (
+            <div className="section">
+              <h2 className="section-title">Connected Accounts</h2>
+              <div className="accounts-grid">
+                {connectedAccounts.map((account) => {
+                  // Format the display name properly
+                  const displayName = account.account_name || account.platform_name || 'Unknown Account'
+                  
+                  // For LinkedIn company pages, show the vanity name instead of org ID
+                  let displayUsername = account.username || account.account_id || 'unknown'
+                  if (account.platform === 'linkedin' && (account.account_name || '').includes('(Company)')) {
+                    // Extract vanity name from the company name
+                    const cleanName = (account.account_name || '').replace(' (Company)', '').replace(' (Company Page)', '')
+                    displayUsername = cleanName.toLowerCase().replace(/\s+/g, '')
+                  }
+                  
+                  const displayFollowers = account.followers ?? 0
+                  const displayPosts = account.posts ?? 0
+                  const displayStatus = account.is_active ? 'Active' : 'Inactive'
+                  
+                  return (
+                    <div key={account.id} className="account-card card">
+                      <div className="account-header">
+                        <div 
+                          className="account-icon"
+                          style={{ background: `${getPlatformColor(account.platform)}20`, color: getPlatformColor(account.platform) }}
+                        >
+                          {platforms.find(p => p.id === account.platform)?.icon}
+                        </div>
+                        <div className={`account-status ${account.is_active ? 'status-active' : 'status-inactive'}`}>
+                          {displayStatus}
+                        </div>
+                      </div>
+
+                      <h3 className="account-name">{displayName}</h3>
+                      <p className="account-username">@{displayUsername}</p>
+
+                      <div className="account-stats">
+                        <div className="account-stat">
+                          <span className="stat-label">Followers</span>
+                          <span className="stat-value">{displayFollowers.toLocaleString()}</span>
+                        </div>
+                        <div className="account-stat">
+                          <span className="stat-label">Posts</span>
+                          <span className="stat-value">{displayPosts}</span>
+                        </div>
+                      </div>
+
+                      <div className="account-meta">
+                        Connected {account.created_at ? new Date(account.created_at).toLocaleDateString() : (account.connected_at ? new Date(account.connected_at).toLocaleDateString() : 'Recently')}
+                      </div>
+
+                      <button 
+                        className="btn btn-secondary btn-block"
+                        onClick={() => handleDisconnect(account.id)}
+                      >
+                        Disconnect
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Available Platforms */}
+          <div className="section">
+            <h2 className="section-title">
+              {connectedAccounts.length > 0 ? 'Connect More Accounts' : 'Connect Your First Account'}
+            </h2>
+            <div className="platforms-grid">
+              {platforms.map((platform) => {
+                const isConnected = getAccountByPlatform(platform.id)
+                const isConnecting = connectingPlatform === platform.id
+
+                return (
+                  <div key={platform.id} className={`platform-card card ${isConnected ? 'connected' : ''}`}>
+                    <div 
+                      className="platform-icon"
+                      style={{ background: `${platform.color}20`, color: platform.color }}
+                    >
+                      {platform.icon}
+                    </div>
+                    
+                    <h3 className="platform-name">{platform.name}</h3>
+                    <p className="platform-description">{platform.description}</p>
+
+                    <button 
+                      className={`btn ${isConnected ? 'btn-secondary' : 'btn-primary'} btn-block`}
+                      onClick={() => handleConnect(platform)}
+                      disabled={isConnected || isConnecting}
+                    >
+                      {isConnecting ? (
+                        <>
+                          <div className="spinner-small"></div>
+                          Connecting...
+                        </>
+                      ) : isConnected ? (
+                        <>
+                          <svg className="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M5 13l4 4L19 7" />
+                          </svg>
+                          Connected
+                        </>
+                      ) : (
+                        <>
+                          <svg className="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                          </svg>
+                          Connect
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default SocialAccounts

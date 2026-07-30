@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Test files
+test_*.py
+
+# Generated images
+backend/generated_images/*.png
+backend/generated_images/*.jpg
+!backend/generated_images/.gitkeep
+
+# Node modules
+node_modules/
+dist/
+build/
+
+# Privacy policy template (don't commit)
+privacy-policy-template.md

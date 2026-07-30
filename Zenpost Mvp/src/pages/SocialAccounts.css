@@ -1,0 +1,565 @@
+@import '../theme-blue-black.css';
+
+/* ============================================================
+   PREMIUM SOCIAL ACCOUNTS PAGE - MODERN & SLEEK
+   ============================================================ */
+
+.social-accounts-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #000000 0%, #0a0a0f 50%, #000000 100%);
+  padding-top: 5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated background gradient */
+.social-accounts-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
+  animation: gradientShift 20s ease infinite;
+  pointer-events: none;
+}
+
+@keyframes gradientShift {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+/* ============================================================
+   STATS OVERVIEW - PREMIUM CARDS
+   ============================================================ */
+
+.stats-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 
+    0 20px 60px rgba(59, 130, 246, 0.15),
+    0 0 80px rgba(59, 130, 246, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+.stat-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+  background: linear-gradient(135deg, #fff, rgba(255, 255, 255, 0.7));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================================
+   SECTION HEADERS
+   ============================================================ */
+
+.section {
+  margin-bottom: 4rem;
+  position: relative;
+  z-index: 1;
+}
+
+.section-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 2rem;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 2px;
+}
+
+/* ============================================================
+   CONNECTED ACCOUNTS - PREMIUM GLASS CARDS
+   ============================================================ */
+
+.accounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 2rem;
+}
+
+.account-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.75rem;
+  padding: 2.5rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.account-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.account-card:hover {
+  transform: translateY(-10px);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 
+    0 25px 70px rgba(59, 130, 246, 0.2),
+    0 0 100px rgba(59, 130, 246, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.account-card:hover::before {
+  opacity: 1;
+}
+
+.account-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.account-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.account-icon svg {
+  width: 36px;
+  height: 36px;
+}
+
+.account-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.status-active {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-active::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.account-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.account-username {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+
+.account-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.account-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.account-stat .stat-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.account-stat .stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+.account-meta {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+/* ============================================================
+   PLATFORM CARDS - CONNECT NEW ACCOUNTS
+   ============================================================ */
+
+.platforms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.platform-card {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1.75rem;
+  padding: 2.5rem;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.platform-card::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.platform-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 
+    0 20px 60px rgba(59, 130, 246, 0.15),
+    0 0 80px rgba(59, 130, 246, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.platform-card:hover::before {
+  opacity: 1;
+}
+
+.platform-card.connected {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.03);
+}
+
+.platform-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 1.75rem;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.4s;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.platform-card:hover .platform-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.platform-icon svg {
+  width: 40px;
+  height: 40px;
+}
+
+.platform-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.platform-description {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   BUTTONS - PREMIUM STYLE
+   ============================================================ */
+
+.btn-block {
+  width: 100%;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  font-weight: 600;
+  padding: 1rem 2rem;
+  border-radius: 1rem;
+  transition: all 0.3s;
+  overflow: hidden;
+}
+
+.btn-block::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-block:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  box-shadow: 
+    0 10px 30px rgba(59, 130, 246, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 15px 40px rgba(59, 130, 246, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.btn-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 0.5rem;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   RESPONSIVE DESIGN
+   ============================================================ */
+
+@media (max-width: 1024px) {
+  .accounts-grid,
+  .platforms-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-overview {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .accounts-grid,
+  .platforms-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-card,
+  .platform-card {
+    padding: 2rem;
+  }
+
+  .account-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .account-status {
+    margin-top: 1rem;
+  }
+}
+
+/* ============================================================
+   LOADING & EMPTY STATES
+   ============================================================ */
+
+.no-accounts {
+  text-align: center;
+  padding: 6rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.no-accounts svg {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 2rem;
+  color: rgba(59, 130, 246, 0.3);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.no-accounts h3 {
+  font-size: 1.5rem;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.no-accounts p {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+}

@@ -1,0 +1,193 @@
+.onboarding-wizard {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  padding-top: 5rem;
+}
+
+/* Header */
+.onboarding-header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 2rem 0;
+  position: sticky;
+  top: 5rem;
+  z-index: 100;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.branding {
+  flex: 1;
+}
+
+.wizard-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.wizard-title svg {
+  width: 28px;
+  height: 28px;
+  color: var(--accent-purple-light);
+}
+
+.wizard-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Progress Steps */
+.progress-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.progress-step-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.step-number {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  border: 3px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--text-tertiary);
+  transition: all 0.3s ease;
+}
+
+.progress-step.active .step-number {
+  background: var(--gradient-purple);
+  border-color: var(--accent-purple);
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.progress-step.completed .step-number {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+  color: white;
+}
+
+.progress-step.completed .step-number svg {
+  width: 24px;
+  height: 24px;
+}
+
+.step-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.progress-step.active .step-title {
+  color: var(--accent-purple-light);
+}
+
+.progress-step.completed .step-title {
+  color: var(--text-primary);
+}
+
+.step-connector {
+  width: 80px;
+  height: 3px;
+  background: var(--border-color);
+  margin: 0 1rem;
+  position: relative;
+  top: -12px;
+}
+
+.progress-step.completed + .progress-step-wrapper .step-connector {
+  background: var(--accent-purple);
+}
+
+/* Content */
+.onboarding-content {
+  padding: 3rem 0;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .progress-steps {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .step-connector {
+    width: 40px;
+    margin: 0 0.5rem;
+  }
+
+  .step-title {
+    font-size: 0.75rem;
+  }
+
+  .step-number {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .wizard-title {
+    font-size: 1.5rem;
+  }
+
+  .wizard-title svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .step-title {
+    display: none;
+  }
+
+  .step-connector {
+    width: 30px;
+  }
+
+  .step-number {
+    width: 36px;
+    height: 36px;
+  }
+
+  .onboarding-content {
+    padding: 2rem 0;
+  }
+}

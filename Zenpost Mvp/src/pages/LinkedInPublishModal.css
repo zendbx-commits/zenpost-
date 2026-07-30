@@ -1,0 +1,79 @@
+.linkedin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.linkedin-modal {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.linkedin-modal-header {
+  padding: 20px;
+  border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.linkedin-modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #000;
+}
+
+.linkedin-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.linkedin-modal-body {
+  padding: 20px;
+}
+
+.linkedin-modal-footer {
+  padding: 20px;
+  border-top: 1px solid #e5e5e5;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.linkedin-modal button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.linkedin-modal .cancel-btn {
+  background: #f3f3f3;
+  color: #333;
+}
+
+.linkedin-modal .publish-btn {
+  background: #0a66c2;
+  color: white;
+}
+
+.linkedin-modal .publish-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
