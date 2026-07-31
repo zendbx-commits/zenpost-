@@ -104,15 +104,15 @@ export function addSamplePostsToLocalStorage(userId, count = 15) {
   const allPosts = [...existingPosts, ...posts];
   localStorage.setItem(`zenpost_scheduled_posts_${userId}`, JSON.stringify(allPosts));
   
-  console.log(`✅ Added ${posts.length} sample posts to localStorage`);
-  console.log(`📊 Total posts: ${allPosts.length}`);
+  console.log(`Added ${posts.length} sample posts to localStorage`);
+  console.log(`Total posts: ${allPosts.length}`);
   
   return allPosts;
 }
 
 export function clearAllPosts(userId) {
   localStorage.removeItem(`zenpost_scheduled_posts_${userId}`);
-  console.log('🗑️ Cleared all posts from localStorage');
+  console.log('Cleared all posts from localStorage');
 }
 
 // Export for console access

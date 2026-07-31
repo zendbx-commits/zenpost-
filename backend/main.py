@@ -218,6 +218,42 @@ async def health_check():
     }
 
 
+@app.get("/api/token-usage/{user_id}")
+async def get_token_usage(user_id: str, days: int = 30):
+    """
+    Get token usage analytics for a user
+    
+    Args:
+        user_id: User ID
+        days: Number of days to look back (default 30)
+    
+    Returns:
+        Token usage summary with breakdowns by operation type and model
+    """
+    try:
+        from services.token_tracker import token_tracker
+        
+        # Inject ZenDBX service if not already done
+        if not token_tracker.zendbx_service:
+            token_tracker.set_zendbx_service(zendbx_service)
+        
+        summary = await token_tracker.get_user_usage_summary(user_id, days)
+        
+        return {
+            "success": True,
+            "user_id": user_id,
+            "period_days": days,
+            **summary
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get token usage: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to retrieve token usage: {str(e)}"
+        )
+
+
 # Main Analysis Endpoint
 @app.post("/api/analyze", response_model=AnalysisResultResponse)
 async def analyze_website(request: AnalysisRequest):
@@ -4072,3 +4108,260 @@ async def shutdown_event():
     
     logger.info("✅ Post scheduler stopped")
     logger.info("=" * 60)
+
+
+# ============================================================
+# SUBSCRIPTION & FEATURE GATING ENDPOINTS
+# ============================================================
+
+from services.subscription_service import subscription_service
+
+@app.get("/api/subscription/plan/{user_id}")
+async def get_user_plan(user_id: str):
+    """Get user's subscription plan with features"""
+    try:
+        plan = await subscription_service.get_user_plan(user_id)
+        return {
+            "success": True,
+            "plan": plan
+        }
+    except Exception as e:
+        logger.error(f"Failed to get user plan: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/subscription/usage/{user_id}")
+async def get_user_usage(user_id: str):
+    """Get user's usage statistics"""
+    try:
+        usage = await subscription_service.get_user_usage(user_id)
+        return {
+            "success": True,
+            "usage": usage
+        }
+    except Exception as e:
+        logger.error(f"Failed to get user usage: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/subscription/summary/{user_id}")
+async def get_usage_summary(user_id: str):
+    """Get complete usage summary with limits and progress"""
+    try:
+        summary = await subscription_service.get_usage_summary(user_id)
+        return {
+            "success": True,
+            **summary
+        }
+    except Exception as e:
+        logger.error(f"Failed to get usage summary: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/subscription/check-feature")
+async def check_feature(request: dict):
+    """
+    Check if user can access a feature
+    
+    Request: {
+        "user_id": "uuid",
+        "feature": "website_analysis"
+    }
+    """
+    try:
+        user_id = request.get("user_id")
+        feature = request.get("feature")
+        
+        if not user_id or not feature:
+            raise HTTPException(status_code=400, detail="user_id and feature are required")
+        
+        allowed, info = await subscription_service.check_feature_limit(user_id, feature, increment=0)
+        
+        return {
+            "success": True,
+            "allowed": allowed,
+            **info
+        }
+    except Exception as e:
+        logger.error(f"Failed to check feature: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/subscription/increment-usage")
+async def increment_usage(request: dict):
+    """
+    Increment usage counter for a feature
+    
+    Request: {
+        "user_id": "uuid",
+        "feature": "ai_captions",
+        "amount": 1
+    }
+    """
+    try:
+        user_id = request.get("user_id")
+        feature = request.get("feature")
+        amount = request.get("amount", 1)
+        
+        if not user_id or not feature:
+            raise HTTPException(status_code=400, detail="user_id and feature are required")
+        
+        success = await subscription_service.increment_usage(user_id, feature, amount)
+        
+        return {
+            "success": success,
+            "message": f"Usage incremented for {feature}"
+        }
+    except Exception as e:
+        logger.error(f"Failed to increment usage: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ======================
+# BRAND MANAGEMENT
+# ======================
+
+from fastapi import File, UploadFile, Form
+import shutil
+from pathlib import Path
+
+# Create uploads directory if not exists
+UPLOAD_DIR = Path("uploads/brand_logos")
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+class BrandRequest(BaseModel):
+    brand_name: str
+    description: Optional[str] = None
+    voice_tone: Optional[str] = None
+    logo_url: Optional[str] = None
+    user_id: str
+
+@app.post("/api/upload-brand-logo")
+async def upload_brand_logo(
+    file: UploadFile = File(...),
+    user_id: str = Form(...)
+):
+    """
+    Upload brand logo
+    """
+    try:
+        # Validate file type
+        allowed_types = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml']
+        if file.content_type not in allowed_types:
+            raise HTTPException(status_code=400, detail="Only PNG, JPG, and SVG files are allowed")
+        
+        # Validate file size (5MB max)
+        file_content = await file.read()
+        if len(file_content) > 5 * 1024 * 1024:
+            raise HTTPException(status_code=400, detail="File size must be less than 5MB")
+        
+        # Generate unique filename
+        file_extension = file.filename.split('.')[-1]
+        unique_filename = f"{user_id}_{uuid.uuid4()}.{file_extension}"
+        file_path = UPLOAD_DIR / unique_filename
+        
+        # Save file
+        with open(file_path, 'wb') as f:
+            f.write(file_content)
+        
+        # Return public URL (relative path)
+        logo_url = f"/uploads/brand_logos/{unique_filename}"
+        
+        logger.info(f"Logo uploaded successfully: {logo_url}")
+        
+        return {
+            "success": True,
+            "logo_url": logo_url
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Logo upload error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/create-brand")
+async def create_brand(request: BrandRequest):
+    """
+    Create brand identity
+    """
+    try:
+        # Check brand limit for user
+        allowed, info = await subscription_service.check_feature_limit(
+            request.user_id,
+            'brands',
+            increment=1
+        )
+        
+        if not allowed:
+            raise HTTPException(
+                status_code=403,
+                detail={
+                    "success": False,
+                    "code": "PLAN_LIMIT_REACHED",
+                    "feature": "brands",
+                    "message": f"You've reached your brand limit ({info['limit']}). Upgrade to Pro for unlimited brands.",
+                    "upgrade_required": True,
+                    "current_usage": info['current_usage'],
+                    "limit": info['limit']
+                }
+            )
+        
+        brand_data = {
+            "id": str(uuid.uuid4()),
+            "user_id": request.user_id,
+            "brand_name": request.brand_name,
+            "description": request.description,
+            "voice_tone": request.voice_tone,
+            "logo_url": request.logo_url,
+            "created_at": datetime.now(pytz.UTC).isoformat(),
+            "is_active": True
+        }
+        
+        # Store in database
+        response = await zendbx_service.insert_data("brands", brand_data)
+        
+        if not response or response.get('error'):
+            raise HTTPException(status_code=500, detail="Failed to create brand")
+        
+        # Increment brand usage count
+        await subscription_service.increment_usage(request.user_id, 'brands', 1)
+        
+        logger.info(f"Brand created: {brand_data['id']}")
+        
+        return {
+            "success": True,
+            "brand_id": brand_data['id'],
+            "message": "Brand created successfully"
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Create brand error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/brands/{user_id}")
+async def get_user_brands(user_id: str):
+    """
+    Get all brands for a user
+    """
+    try:
+        response = await zendbx_service.query_data(
+            "brands",
+            filters={"user_id": user_id, "is_active": True}
+        )
+        
+        brands = response.get('data', [])
+        
+        return {
+            "success": True,
+            "brands": brands
+        }
+    
+    except Exception as e:
+        logger.error(f"Get brands error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Mount static files for serving uploaded logos
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")

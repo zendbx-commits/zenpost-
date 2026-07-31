@@ -132,9 +132,9 @@ export default function Autopilot() {
     setAutopilotEnabled(newState);
     
     if (newState) {
-      alert('🚀 Autopilot activated! Your posts will be published automatically.');
+      alert('Autopilot activated! Your posts will be published automatically.');
     } else {
-      alert('⏸️ Autopilot paused. Auto-publishing is disabled.');
+      alert('Autopilot paused. Auto-publishing is disabled.');
     }
   };
 
@@ -226,14 +226,14 @@ export default function Autopilot() {
         <div className="container">
           <div className="status-grid">
             <div className="status-card">
-              <div className="status-icon">📅</div>
+              <div className="status-icon">Queue</div>
               <div className="status-content">
                 <div className="status-value">{stats.postsScheduled}</div>
                 <div className="status-label">Posts in Queue</div>
               </div>
             </div>
             <div className="status-card">
-              <div className="status-icon">⏰</div>
+              <div className="status-icon">Next</div>
               <div className="status-content">
                 <div className="status-value">
                   {stats.nextPostDate ? new Date(stats.nextPostDate).toLocaleDateString() : 'N/A'}
@@ -242,14 +242,14 @@ export default function Autopilot() {
               </div>
             </div>
             <div className="status-card">
-              <div className="status-icon">📊</div>
+              <div className="status-icon">Engage</div>
               <div className="status-content">
                 <div className="status-value">{stats.averageEngagement}%</div>
                 <div className="status-label">Avg. Engagement</div>
               </div>
             </div>
             <div className="status-card">
-              <div className="status-icon">🔋</div>
+              <div className="status-icon">Buffer</div>
               <div className="status-content">
                 <div className="status-value">{stats.bufferRemaining} days</div>
                 <div className="status-label">Content Buffer</div>
@@ -265,7 +265,7 @@ export default function Autopilot() {
           <div className="settings-grid">
             {/* Platforms */}
             <div className="settings-card">
-              <h3 className="card-title">📱 Active Platforms</h3>
+              <h3 className="card-title">Active Platforms</h3>
               <p className="card-description">Select platforms for auto-publishing</p>
               <div className="platforms-list">
                 {Object.keys(settings.platforms).map(platform => (
@@ -283,7 +283,7 @@ export default function Autopilot() {
 
             {/* Schedule */}
             <div className="settings-card">
-              <h3 className="card-title">⏰ Publishing Schedule</h3>
+              <h3 className="card-title">Publishing Schedule</h3>
               <p className="card-description">When to publish posts automatically</p>
               <div className="schedule-settings">
                 <div className="form-group">
@@ -322,7 +322,7 @@ export default function Autopilot() {
 
             {/* Content */}
             <div className="settings-card">
-              <h3 className="card-title">📝 Content Settings</h3>
+              <h3 className="card-title">Content Settings</h3>
               <p className="card-description">How to manage content generation</p>
               <div className="content-settings">
                 <label className="checkbox-label">

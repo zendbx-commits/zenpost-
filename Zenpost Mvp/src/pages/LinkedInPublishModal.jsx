@@ -298,7 +298,7 @@ export default function LinkedInPublishModal({ post, onClose, onPublished }) {
                     onClick={generateImage}
                     disabled={imageLoading}
                   >
-                    {imageLoading ? '⏳ Regenerating...' : '🔄 Regenerate'}
+                    {imageLoading ? 'Regenerating...' : 'Regenerate'}
                   </button>
                   <button 
                     className="btn btn-secondary btn-sm"
@@ -326,7 +326,7 @@ export default function LinkedInPublishModal({ post, onClose, onPublished }) {
                           Generating Image...
                         </>
                       ) : (
-                        '🎨 Generate Image with AI'
+                        'Generate Image with AI'
                       )}
                     </button>
                   </>
@@ -353,7 +353,7 @@ export default function LinkedInPublishModal({ post, onClose, onPublished }) {
                 </div>
                 <div className="preview-info">
                   <div className="preview-name">{selectedAccount?.username || 'Your Name'}</div>
-                  <div className="preview-meta">Just now • 🌐</div>
+                  <div className="preview-meta">Just now</div>
                 </div>
               </div>
               <div className="preview-content">

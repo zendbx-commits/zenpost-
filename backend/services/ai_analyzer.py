@@ -56,18 +56,22 @@ class AIAnalyzer:
             logger.info(f"✓ Using OpenRouter with model: {self.model}")
             logger.info(f"✓ Base URL: https://openrouter.ai/api/v1")
         else:
-            # Groq
+            # Groq - use faster, cheaper model
             api_key = os.getenv("GROQ_API_KEY")
             if not api_key:
                 raise ValueError("GROQ_API_KEY environment variable not set")
             
             logger.info(f"DEBUG: Creating Groq client")
             self.client = Groq(api_key=api_key)
-            self.model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+            # Use llama-3.1-8b-instant - MUCH faster and cheaper than 70b
+            self.model = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
             logger.info(f"✓ Using Groq with model: {self.model}")
         
-        self.max_tokens = 8000
+        # Reduce max_tokens to save costs
+        self.max_tokens = 4000  # Reduced from 8000
         logger.info(f"DEBUG: Client type = {type(self.client).__name__}")
+        logger.info(f"DEBUG: Max tokens set to {self.max_tokens} (optimized for cost)")
+
     
     async def analyze_brand(self, extracted_data: Dict) -> Dict:
         """Step 5: Brand Analysis"""

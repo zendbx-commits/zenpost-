@@ -158,7 +158,7 @@ export default function SchedulePosts() {
 
       const result = await response.json();
 
-      alert(`✅ Successfully scheduled ${selectedPosts.size} posts!\n\nPosts will be automatically published at their scheduled times.`);
+      alert(`Successfully scheduled ${selectedPosts.size} posts!\n\nPosts will be automatically published at their scheduled times.`);
       
       // Navigate to a monitoring page or campaigns
       navigate('/campaigns', { 
@@ -210,7 +210,7 @@ export default function SchedulePosts() {
           <div className="header-content">
             <div className="header-text">
               <h1 className="page-title">
-                <span className="gradient-text">📅 Schedule Posts</span>
+                <span className="gradient-text">Schedule Posts</span>
               </h1>
               <p className="page-subtitle">
                 Select posts, set times, and enable auto-posting
@@ -235,7 +235,7 @@ export default function SchedulePosts() {
                   </>
                 ) : (
                   <>
-                    🚀 Schedule {selectedPosts.size} Post{selectedPosts.size !== 1 ? 's' : ''}
+                    Schedule {selectedPosts.size} Post{selectedPosts.size !== 1 ? 's' : ''}
                   </>
                 )}
               </button>
@@ -301,7 +301,7 @@ export default function SchedulePosts() {
                     <div className="schedule-settings">
                       {/* Time Picker */}
                       <div className="setting-group">
-                        <label>⏰ Posting Time</label>
+                        <label>Posting Time</label>
                         <input
                           type="time"
                           value={schedule.time || '10:00'}
@@ -312,7 +312,7 @@ export default function SchedulePosts() {
 
                       {/* Platform Selector */}
                       <div className="setting-group">
-                        <label>📱 Platforms</label>
+                        <label>Platforms</label>
                         <div className="platform-toggles">
                           {['LinkedIn', 'Twitter', 'Facebook'].map(platform => (
                             <button

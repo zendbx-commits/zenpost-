@@ -72,7 +72,7 @@ const Campaigns = () => {
         created++;
       }
 
-      alert(`✅ Successfully saved ${created} campaigns!\n\nNote: To post to LinkedIn, use the calendar view and click "Post to LinkedIn" on any post.`);
+      alert(`Successfully saved ${created} campaigns!\n\nNote: To post to LinkedIn, use the calendar view and click "Post to LinkedIn" on any post.`);
       
       // Switch to list view to see saved campaigns
       setView('list');
@@ -258,7 +258,7 @@ const Campaigns = () => {
             <div className="header-content">
               <div className="header-text">
                 <h1 className="page-title">
-                  <span className="gradient-text">📅 Content Calendar</span>
+                  <span className="gradient-text">Content Calendar</span>
                 </h1>
                 <p className="page-subtitle">
                   {summary.total_posts} posts across {summary.total_campaigns} campaigns • {summary.duration_days} days
@@ -281,7 +281,7 @@ const Campaigns = () => {
                   })}
                   style={{ marginRight: '0.5rem' }}
                 >
-                  📅 Schedule Posts
+                  Schedule Posts
                 </button>
                 <button 
                   className="btn btn-secondary"
@@ -699,7 +699,7 @@ const Campaigns = () => {
                   <h3>No Posts in This Campaign</h3>
                   <p style={{ marginBottom: '1rem' }}>Saved campaigns don't include individual post data yet.</p>
                   <div style={{ background: '#f0f9ff', padding: '1rem', borderRadius: '8px', fontSize: '0.9em' }}>
-                    <strong>💡 To post to LinkedIn:</strong>
+                    <strong>To post to LinkedIn:</strong>
                     <ol style={{ textAlign: 'left', margin: '0.5rem 0 0 1.5rem', lineHeight: '1.6' }}>
                       <li>Go to Website Analysis page</li>
                       <li>Click "Generate Marketing Intelligence"</li>

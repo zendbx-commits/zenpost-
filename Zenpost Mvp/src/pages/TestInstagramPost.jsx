@@ -95,7 +95,7 @@ const TestInstagramPost = () => {
       if (response.ok && data.success) {
         setResult({
           success: true,
-          message: 'Post published successfully! 🎉',
+          message: 'Post published successfully!',
           postId: data.post_id,
           permalink: data.permalink
         })

@@ -49,68 +49,41 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     try {
       const user = await zendbx.auth.getUser()
-      if (!user || !user.id) return
+      if (!user || !user.id) {
+        console.log('No user found')
+        return
+      }
 
-      console.log('🔍 Fetching dashboard data for user:', user.id)
+      console.log('Fetching dashboard data for user:', user.id)
 
-      // Fetch from scheduled_posts table (our main data source now)
-      const scheduledResponse = await zendbx.from('scheduled_posts').select('*')
-      const allScheduled = scheduledResponse?.data || []
+      // Fetch all scheduled_posts and filter client-side
+      const scheduledResponse = await zendbx.from('scheduled_posts').select('*');
       
-      console.log('🔧 Raw data from DB:', allScheduled[0])
+      let userScheduled = scheduledResponse?.data || [];
       
-      // Parse metadata if it's a string (ZendBX returns JSONB as string sometimes)
-      const parsedScheduled = allScheduled.map(post => {
-        try {
-          const parsedMetadata = typeof post.metadata === 'string' ? JSON.parse(post.metadata) : post.metadata
-          console.log('✅ Parsed metadata for post:', post.id, parsedMetadata)
-          return {
-            ...post,
-            metadata: parsedMetadata
-          }
-        } catch (error) {
-          console.error('❌ Error parsing metadata for post:', post.id, error)
-          return post
-        }
-      })
+      // Filter by user_id client-side
+      userScheduled = userScheduled.filter(post => post.user_id === user.id);
       
-      console.log('📊 Total scheduled_posts in DB:', parsedScheduled.length)
+      console.log('User scheduled posts:', userScheduled.length)
+      console.log('User scheduled data:', userScheduled)
       
-      // Log each post to see the metadata structure
-      parsedScheduled.forEach((post, i) => {
-        console.log(`📋 Post ${i + 1}:`, {
-          id: post.id,
-          platform: post.platform,
-          status: post.status,
-          metadata_type: typeof post.metadata,
-          metadata_keys: post.metadata ? Object.keys(post.metadata) : [],
-          metadata_user_id: post.metadata?.user_id,
-          user_id_looking_for: user.id,
-          matches: post.metadata?.user_id === user.id
-        })
-      })
+      const scheduledCount = userScheduled.filter(s => 
+        s.status === 'scheduled' || s.status === 'pending'
+      ).length
       
-      // Since user_id is not in metadata, show all posts for now (single user scenario)
-      // TODO: Fix backend to properly save user_id in metadata
-      const userScheduled = parsedScheduled // Show all posts
+      const publishedPosts = userScheduled.filter(s => 
+        s.status === 'published' || s.status === 'posted'
+      )
       
-      console.log('⚠️ Showing all posts (user_id not in metadata)')
-      
-      console.log('📊 User scheduled posts:', userScheduled.length)
-      console.log('📊 User scheduled data:', userScheduled)
-      
-      const scheduledCount = userScheduled.filter(s => s.status === 'scheduled').length
-      const publishedPosts = userScheduled.filter(s => s.status === 'published')
-      
-      console.log('✅ Scheduled:', scheduledCount)
-      console.log('✅ Published:', publishedPosts.length)
+      console.log('Scheduled:', scheduledCount)
+      console.log('Published:', publishedPosts.length)
 
       // Fetch from generated_campaigns table
       const campaignsResponse = await zendbx.from('generated_campaigns').select('*')
       const allCampaigns = campaignsResponse?.data || []
       const activeCampaigns = allCampaigns.length // Simplified
       
-      console.log('📊 Total campaigns:', activeCampaigns)
+      console.log('Total campaigns:', activeCampaigns)
 
       // Simple metrics
       const totalReach = 0 // Will be populated when analytics are tracked
@@ -187,9 +160,10 @@ const Dashboard = () => {
         engagementTrend
       })
       
-      console.log('✅ Dashboard data updated')
+      console.log('Dashboard data updated')
     } catch (error) {
-      console.error('❌ Error fetching dashboard data:', error)
+      console.error('Error fetching dashboard data:', error)
+      console.error('Error details:', error.message, error.stack)
     }
   }
 

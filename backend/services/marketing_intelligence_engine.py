@@ -39,10 +39,13 @@ class MarketingIntelligenceEngine:
                 raise ValueError("GROQ_API_KEY not set")
             
             self.client = Groq(api_key=api_key)
-            self.model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+            # Use faster 8b model for marketing intelligence
+            self.model = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
             logger.info(f"✓ Marketing Intelligence using Groq: {self.model}")
         
-        self.max_tokens = 8000
+        # Reduced max tokens for efficiency
+        self.max_tokens = 3000  # Reduced from 8000
+        logger.info(f"✓ Max tokens set to {self.max_tokens} (optimized)")
     
     async def generate_intelligence(self, website_analysis: Dict) -> Dict:
         """

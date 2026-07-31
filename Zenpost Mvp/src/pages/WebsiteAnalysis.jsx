@@ -687,7 +687,7 @@ const ContentTab = ({ calendar, ideas }) => {
         created++
       }
 
-      alert(`✅ Successfully created ${created} campaigns from your content calendar!`)
+      alert(`Successfully created ${created} campaigns from your content calendar!`)
       navigate('/campaigns')
     } catch (error) {
       console.error('Error creating campaigns:', error)

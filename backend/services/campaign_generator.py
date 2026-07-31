@@ -40,10 +40,13 @@ class CampaignGenerator:
                 raise ValueError("GROQ_API_KEY not set")
             
             self.client = Groq(api_key=api_key)
-            self.model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+            # Use faster 8b model
+            self.model = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
             logger.info(f"✓ Campaign Generator using Groq: {self.model}")
         
-        self.max_tokens = 8000
+        # Reduce max_tokens significantly for content generation
+        self.max_tokens = 6000  # Reduced from 8000, but keep higher for 30 posts
+        logger.info(f"✓ Max tokens set to {self.max_tokens} (optimized)")
     
     async def generate_campaigns_from_intelligence(
         self, 

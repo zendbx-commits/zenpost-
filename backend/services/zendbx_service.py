@@ -595,3 +595,174 @@ class ZenDBXService:
         except Exception as e:
             logger.error(f"Error retrieving social accounts: {str(e)}")
             return []
+    
+    async def store_token_usage(self, usage_record: Dict) -> str:
+        """
+        Store token usage record in token_usage table
+        
+        Args:
+            usage_record: Token usage data
+        
+        Returns:
+            usage_id: UUID of stored record
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{self.base_url}/token_usage",
+                    headers=self.headers,
+                    json=usage_record,
+                    timeout=30.0
+                )
+                
+                if response.status_code in [200, 201]:
+                    logger.info(f"✅ Token usage stored: {usage_record['id']}")
+                    return usage_record['id']
+                else:
+                    logger.error(f"Failed to store token usage: {response.status_code} - {response.text}")
+                    return None
+        
+        except Exception as e:
+            logger.error(f"Error storing token usage: {str(e)}")
+            return None
+    
+    async def get_token_usage(self, user_id: str, days: int = 30) -> list:
+        """
+        Get token usage records for a user
+        
+        Args:
+            user_id: User ID
+            days: Number of days to look back
+        
+        Returns:
+            List of token usage records
+        """
+        try:
+            from datetime import datetime, timedelta
+            cutoff_date = (datetime.utcnow() - timedelta(days=days)).isoformat()
+            
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{self.base_url}/token_usage",
+                    headers=self.headers,
+                    timeout=30.0
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    all_records = data if isinstance(data, list) else []
+                    
+                    # Filter by user_id and date
+                    user_records = [
+                        r for r in all_records
+                        if r.get('user_id') == user_id and r.get('created_at', '') >= cutoff_date
+                    ]
+                    
+                    return user_records
+                
+                return []
+        
+        except Exception as e:
+            logger.error(f"Error retrieving token usage: {str(e)}")
+            return []
+    
+    async def get_token_usage_since(self, user_id: str, since_date: str) -> list:
+        """
+        Get token usage records since a specific date
+        
+        Args:
+            user_id: User ID
+            since_date: ISO format date string
+        
+        Returns:
+            List of token usage records
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{self.base_url}/token_usage",
+                    headers=self.headers,
+                    timeout=30.0
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    all_records = data if isinstance(data, list) else []
+                    
+                    # Filter by user_id and date
+                    user_records = [
+                        r for r in all_records
+                        if r.get('user_id') == user_id and r.get('created_at', '') >= since_date
+                    ]
+                    
+                    return user_records
+                
+                return []
+        
+        except Exception as e:
+            logger.error(f"Error retrieving token usage: {str(e)}")
+            return []
+    
+    async def get_user_by_id(self, user_id: str) -> Optional[Dict]:
+        """
+        Get user by ID
+        
+        Args:
+            user_id: User ID
+        
+        Returns:
+            User data with email
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{self.base_url}/users",
+                    headers=self.headers,
+                    timeout=30.0
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    all_users = data if isinstance(data, list) else []
+                    
+                    # Find user by ID
+                    user = next((u for u in all_users if u.get('id') == user_id), None)
+                    return user
+                
+                return None
+        
+        except Exception as e:
+            logger.error(f"Error retrieving user: {str(e)}")
+            return None
+    
+    async def get_user_plan(self, user_id: str) -> Optional[Dict]:
+        """
+        Get user plan/tier information
+        
+        Args:
+            user_id: User ID
+        
+        Returns:
+            User plan data with token limits
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{self.base_url}/user_plans",
+                    headers=self.headers,
+                    timeout=30.0
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    all_plans = data if isinstance(data, list) else []
+                    
+                    # Find plan by user_id
+                    plan = next((p for p in all_plans if p.get('user_id') == user_id), None)
+                    return plan
+                
+                return None
+        
+        except Exception as e:
+            logger.error(f"Error retrieving user plan: {str(e)}")
+            return None

@@ -30,7 +30,7 @@ export default function MarketingIntelligence() {
     setError(null);
 
     try {
-      console.log('🚀 Calling Marketing Intelligence API...');
+      console.log('Calling Marketing Intelligence API...');
       console.log('Website Analysis:', websiteAnalysis);
       
       // Extract user_id from websiteAnalysis
@@ -38,17 +38,17 @@ export default function MarketingIntelligence() {
       
       const result = await generateMarketingIntelligenceFromAnalysis(websiteAnalysis, user_id);
       
-      console.log('✅ Marketing Intelligence Result:', result);
+      console.log('Marketing Intelligence Result:', result);
       console.log('Result type:', typeof result);
       console.log('Result keys:', Object.keys(result || {}));
       
       setIntelligence(result);
       
       // DON'T auto-generate - let user review MI first and click button
-      console.log('✅ Marketing Intelligence ready - waiting for user action');
+      console.log('Marketing Intelligence ready - waiting for user action');
       
     } catch (err) {
-      console.error('❌ Marketing Intelligence Error:', err);
+      console.error('Marketing Intelligence Error:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -58,7 +58,7 @@ export default function MarketingIntelligence() {
   const autoGenerateCampaigns = async (intelligenceData) => {
     setGeneratingCalendar(true);
     try {
-      console.log('📅 Generating 30-day content calendar automatically...');
+      console.log('Generating 30-day content calendar automatically...');
       
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'}/api/generate-campaigns`, {
         method: 'POST',
@@ -77,7 +77,7 @@ export default function MarketingIntelligence() {
       }
 
       const data = await response.json();
-      console.log('✅ Content Calendar Generated:', data.data);
+      console.log('Content Calendar Generated:', data.data);
       
       // Navigate to Campaigns page with generated calendar
       navigate('/campaigns', { 
@@ -90,7 +90,7 @@ export default function MarketingIntelligence() {
       });
       
     } catch (err) {
-      console.error('❌ Campaign generation error:', err);
+      console.error('Campaign generation error:', err);
       // Don't show error, just stay on MI page
       setGeneratingCalendar(false);
     }
@@ -99,7 +99,7 @@ export default function MarketingIntelligence() {
   const generateCampaigns = async () => {
     setGeneratingCalendar(true);
     try {
-      console.log('📅 Generating content calendar from Marketing Intelligence...');
+      console.log('Generating content calendar from Marketing Intelligence...');
       
       // Get user_id from websiteAnalysis or zendbx
       const user_id = websiteAnalysis?.user_id || websiteAnalysis?.metadata?.user_id;
@@ -122,7 +122,7 @@ export default function MarketingIntelligence() {
       }
 
       const data = await response.json();
-      console.log('✅ Content Calendar generated:', data);
+      console.log('Content Calendar generated:', data);
       
       // Save to localStorage for ContentCalendar page
       localStorage.setItem('zenpost_content_calendar', JSON.stringify(data.content_calendar));
@@ -208,7 +208,7 @@ export default function MarketingIntelligence() {
           style={{ marginLeft: 'auto' }}
           disabled={generatingCalendar}
         >
-          {generatingCalendar ? '⏳ Creating Calendar...' : '📅 Generate Content Calendar'}
+          {generatingCalendar ? 'Creating Calendar...' : 'Generate Content Calendar'}
         </button>
       </div>
 

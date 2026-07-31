@@ -17,8 +17,8 @@ class AnalysisService {
   async analyzeWebsite(websiteUrl, userId, websiteId = null, deepCrawl = true) {
     try {
       const url = `${API_BASE_URL}/api/analyze`;
-      console.log('🚀 Calling backend API:', url);
-      console.log('📦 Request payload:', { website_url: websiteUrl, user_id: userId, website_id: websiteId, deep_crawl: deepCrawl });
+      console.log('Calling backend API:', url);
+      console.log('Request payload:', { website_url: websiteUrl, user_id: userId, website_id: websiteId, deep_crawl: deepCrawl });
       
       const response = await fetch(url, {
         method: 'POST',
@@ -33,11 +33,11 @@ class AnalysisService {
         })
       });
 
-      console.log('📨 Response status:', response.status);
+      console.log('Response status:', response.status);
 
       if (!response.ok) {
         const error = await response.json();
-        console.error('❌ Backend error:', error);
+        console.error('Backend error:', error);
         throw new Error(error.detail || 'Analysis failed');
       }
 

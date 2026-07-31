@@ -111,16 +111,16 @@ export default function CreatePost() {
       }
 
       const result = await response.json();
-      console.log('✅ Post scheduled successfully:', result);
+      console.log('Post scheduled successfully:', result);
 
       // Show success message
-      alert(`✅ Post scheduled successfully for ${formData.scheduled_date} at ${formData.scheduled_time}!\n\nThe post will be published to ${formData.platforms.join(', ')}.`);
+      alert(`Post scheduled successfully for ${formData.scheduled_date} at ${formData.scheduled_time}!\n\nThe post will be published to ${formData.platforms.join(', ')}.`);
       
       // Navigate to calendar
       navigate('/content-calendar');
 
     } catch (error) {
-      console.error('❌ Error creating post:', error);
+      console.error('Error creating post:', error);
       alert(`Failed to create post: ${error.message}\n\nPlease try again.`);
     } finally {
       setLoading(false);

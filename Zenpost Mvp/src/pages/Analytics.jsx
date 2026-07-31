@@ -19,6 +19,14 @@ export default function Analytics() {
   const [platformData, setPlatformData] = useState([]);
   const [postPerformance, setPostPerformance] = useState([]);
   const [engagementTrend, setEngagementTrend] = useState([]);
+  const [tokenUsage, setTokenUsage] = useState({
+    totalTokens: 0,
+    totalCost: 0.0,
+    tokensRemaining: 1000000, // Example limit
+    byOperation: {},
+    byModel: {},
+    avgTokensPerPost: 0
+  });
 
   useEffect(() => {
     checkAuthAndLoad();
@@ -140,6 +148,9 @@ export default function Analytics() {
       setPostPerformance(topPosts);
       setEngagementTrend(trendData);
 
+      // Fetch token usage
+      await fetchTokenUsage(user.id);
+
     } catch (error) {
       console.error('Error loading analytics:', error);
     } finally {
@@ -147,15 +158,52 @@ export default function Analytics() {
     }
   };
 
+  const fetchTokenUsage = async (userId) => {
+    try {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001';
+      const days = parseInt(timeRange);
+      
+      const response = await fetch(`${apiBaseUrl}/api/token-usage/${userId}?days=${days}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Calculate average tokens per post
+        const totalOps = data.total_operations || 0;
+        const avgTokensPerPost = totalOps > 0 ? Math.round(data.total_tokens / totalOps) : 0;
+        
+        // Example token limit (you can make this dynamic per user tier)
+        const tokenLimit = 1000000; // 1M tokens
+        const tokensRemaining = tokenLimit - data.total_tokens;
+        
+        setTokenUsage({
+          totalTokens: data.total_tokens || 0,
+          totalCost: data.total_cost || 0.0,
+          tokensRemaining: data.is_unlimited ? Infinity : (data.tokens_remaining || 0),
+          tokenLimit: data.is_unlimited ? null : (data.token_limit || tokenLimit),
+          byOperation: data.by_operation || {},
+          byModel: data.by_model || {},
+          avgTokensPerPost: avgTokensPerPost,
+          totalOperations: totalOps,
+          isUnlimited: data.is_unlimited || false
+        });
+      } else {
+        console.warn('Failed to fetch token usage:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching token usage:', error);
+    }
+  };
+
   const getPlatformIcon = (platform) => {
     const icons = {
-      LinkedIn: '💼',
-      Twitter: '𝕏',
-      Facebook: '📘',
-      Instagram: '📸',
-      Pinterest: '📌'
+      LinkedIn: 'Li',
+      Twitter: 'X',
+      Facebook: 'Fb',
+      Instagram: 'Ig',
+      Pinterest: 'Pi'
     };
-    return icons[platform] || '📱';
+    return icons[platform] || 'SM';
   };
 
   const getPlatformColor = (platform) => {
@@ -281,6 +329,142 @@ export default function Analytics() {
         </div>
       </div>
 
+      {/* AI Token Usage Section */}
+      <div className="metrics-section" style={{ marginTop: '2rem' }}>
+        <div className="container">
+          <h3 className="section-title" style={{ marginBottom: '1.5rem' }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '24px', height: '24px', display: 'inline-block', marginRight: '0.5rem', verticalAlign: 'middle' }}>
+              <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            AI Token Usage
+          </h3>
+          <div className="metrics-grid">
+            {/* Total Tokens Used */}
+            <div className="metric-card" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+              <div className="metric-content" style={{ color: 'white' }}>
+                <div className="metric-label" style={{ color: 'rgba(255,255,255,0.9)', opacity: 0.9 }}>Total Tokens Used</div>
+                <div className="metric-value" style={{ fontSize: '2rem' }}>
+                  {tokenUsage.totalTokens >= 1000000 
+                    ? `${(tokenUsage.totalTokens / 1000000).toFixed(2)}M` 
+                    : tokenUsage.totalTokens >= 1000
+                    ? `${(tokenUsage.totalTokens / 1000).toFixed(1)}K`
+                    : tokenUsage.totalTokens}
+                </div>
+                <div className="metric-change" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                  Last {timeRange} days
+                </div>
+              </div>
+            </div>
+
+            {/* Tokens Remaining */}
+            <div className="metric-card" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
+              <div className="metric-content" style={{ color: 'white' }}>
+                <div className="metric-label" style={{ color: 'rgba(255,255,255,0.9)', opacity: 0.9 }}>
+                  {tokenUsage.isUnlimited ? 'Token Access' : 'Tokens Remaining'}
+                </div>
+                <div className="metric-value" style={{ fontSize: '2rem' }}>
+                  {tokenUsage.isUnlimited ? '∞' : (
+                    tokenUsage.tokensRemaining >= 1000000 
+                      ? `${(tokenUsage.tokensRemaining / 1000000).toFixed(2)}M` 
+                      : tokenUsage.tokensRemaining >= 1000
+                      ? `${(tokenUsage.tokensRemaining / 1000).toFixed(1)}K`
+                      : tokenUsage.tokensRemaining
+                  )}
+                </div>
+                <div className="metric-change" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                  {tokenUsage.isUnlimited ? 'Unlimited' : (
+                    tokenUsage.tokenLimit ? `of ${(tokenUsage.tokenLimit / 1000000).toFixed(1)}M limit` : 'Unlimited'
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Avg Tokens Per Post */}
+            <div className="metric-card" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
+              <div className="metric-content" style={{ color: 'white' }}>
+                <div className="metric-label" style={{ color: 'rgba(255,255,255,0.9)', opacity: 0.9 }}>Avg Tokens/Operation</div>
+                <div className="metric-value" style={{ fontSize: '2rem' }}>
+                  {tokenUsage.avgTokensPerPost >= 1000 
+                    ? `${(tokenUsage.avgTokensPerPost / 1000).toFixed(1)}K` 
+                    : tokenUsage.avgTokensPerPost}
+                </div>
+                <div className="metric-change" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                  {tokenUsage.totalOperations || 0} operations
+                </div>
+              </div>
+            </div>
+
+            {/* Total Cost */}
+            <div className="metric-card" style={{ background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' }}>
+              <div className="metric-content" style={{ color: 'white' }}>
+                <div className="metric-label" style={{ color: 'rgba(255,255,255,0.9)', opacity: 0.9 }}>Estimated Cost</div>
+                <div className="metric-value" style={{ fontSize: '2rem' }}>
+                  ${tokenUsage.totalCost.toFixed(4)}
+                </div>
+                <div className="metric-change" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                  Last {timeRange} days
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Token Usage Progress Bar */}
+          {tokenUsage.tokenLimit && !tokenUsage.isUnlimited && (
+            <div style={{ marginTop: '1.5rem', padding: '1.5rem', background: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <span style={{ fontWeight: '600', color: '#1f2937' }}>Token Usage Progress</span>
+                <span style={{ fontWeight: '600', color: '#6366f1' }}>
+                  {((tokenUsage.totalTokens / tokenUsage.tokenLimit) * 100).toFixed(1)}%
+                </span>
+              </div>
+              <div style={{ width: '100%', height: '12px', background: '#e5e7eb', borderRadius: '6px', overflow: 'hidden' }}>
+                <div style={{ 
+                  width: `${Math.min((tokenUsage.totalTokens / tokenUsage.tokenLimit) * 100, 100)}%`, 
+                  height: '100%', 
+                  background: tokenUsage.totalTokens / tokenUsage.tokenLimit > 0.9 
+                    ? 'linear-gradient(90deg, #f59e0b, #ef4444)' 
+                    : tokenUsage.totalTokens / tokenUsage.tokenLimit > 0.7
+                    ? 'linear-gradient(90deg, #10b981, #f59e0b)'
+                    : 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+                  transition: 'width 0.3s ease'
+                }}></div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', fontSize: '0.875rem', color: '#6b7280' }}>
+                <span>{tokenUsage.totalTokens.toLocaleString()} used</span>
+                <span>{tokenUsage.tokensRemaining.toLocaleString()} remaining</span>
+              </div>
+            </div>
+          )}
+
+          {/* Token Usage by Operation Type */}
+          {Object.keys(tokenUsage.byOperation || {}).length > 0 && (
+            <div style={{ marginTop: '1.5rem' }}>
+              <h4 style={{ marginBottom: '1rem', fontWeight: '600', color: '#1f2937' }}>Token Usage by Operation Type</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+                {Object.entries(tokenUsage.byOperation).map(([operation, data]) => (
+                  <div key={operation} style={{ padding: '1rem', background: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                      <span style={{ fontWeight: '600', color: '#1f2937', textTransform: 'capitalize' }}>
+                        {operation.replace(/_/g, ' ')}
+                      </span>
+                      <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                        {data.count} ops
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#6366f1', marginBottom: '0.25rem' }}>
+                      {data.tokens >= 1000 ? `${(data.tokens / 1000).toFixed(1)}K` : data.tokens}
+                    </div>
+                    <div style={{ fontSize: '0.875rem', color: '#10b981' }}>
+                      ${data.cost.toFixed(4)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Charts Section */}
       <div className="charts-section">
         <div className="container">
@@ -377,9 +561,9 @@ export default function Analytics() {
                       {post.caption?.length > 100 ? '...' : ''}
                     </p>
                     <div className="post-stats">
-                      <span>❤️ {post.likes || 0}</span>
-                      <span>💬 {post.comments || 0}</span>
-                      <span>🔄 {post.shares || 0}</span>
+                      <span>Likes: {post.likes || 0}</span>
+                      <span>Comments: {post.comments || 0}</span>
+                      <span>Shares: {post.shares || 0}</span>
                       <span className="engagement-total">
                         Total: {post.engagement}
                       </span>
