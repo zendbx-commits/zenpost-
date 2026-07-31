@@ -19,8 +19,11 @@ const PinterestConnectionModal = ({ isOpen, onClose, onConnect, userId }) => {
           setIsConnecting(true)
           setError(null)
           
+          // Use environment variable for API base URL
+          const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_PUBLIC_API_BASE_URL || 'http://localhost:8001'
+          
           // Save the connection to the database
-          const response = await fetch('http://localhost:8001/api/auth/pinterest/save-connection', {
+          const response = await fetch(`${apiBaseUrl}/api/auth/pinterest/save-connection`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -78,9 +81,12 @@ const PinterestConnectionModal = ({ isOpen, onClose, onConnect, userId }) => {
       setIsConnecting(true)
       setError(null)
       
+      // Use environment variable for API base URL
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_PUBLIC_API_BASE_URL || 'http://localhost:8001'
+      
       // For now, use direct connection (app not approved yet)
       // This will use the access token configured in backend .env
-      const response = await fetch('http://localhost:8001/api/auth/pinterest/connect-direct', {
+      const response = await fetch(`${apiBaseUrl}/api/auth/pinterest/connect-direct`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

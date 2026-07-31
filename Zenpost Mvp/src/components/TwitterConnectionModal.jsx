@@ -13,8 +13,11 @@ const TwitterConnectionModal = ({ isOpen, onClose, onConnect, userId }) => {
       setLoading(true)
       setError(null)
 
+      // Use environment variable for API base URL
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_PUBLIC_API_BASE_URL || 'http://localhost:8001'
+
       // Call backend to get Twitter auth URL
-      const response = await fetch('http://localhost:8001/api/auth/twitter/initiate', {
+      const response = await fetch(`${apiBaseUrl}/api/auth/twitter/initiate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -59,8 +62,11 @@ const TwitterConnectionModal = ({ isOpen, onClose, onConnect, userId }) => {
       setLoading(true)
       setError(null)
 
+      // Use environment variable for API base URL
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_PUBLIC_API_BASE_URL || 'http://localhost:8001'
+
       // Verify PIN with backend
-      const response = await fetch('http://localhost:8001/api/auth/twitter/verify-pin', {
+      const response = await fetch(`${apiBaseUrl}/api/auth/twitter/verify-pin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -89,8 +95,11 @@ const TwitterConnectionModal = ({ isOpen, onClose, onConnect, userId }) => {
 
   const saveConnection = async (data) => {
     try {
+      // Use environment variable for API base URL
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_PUBLIC_API_BASE_URL || 'http://localhost:8001'
+
       // Save connection to backend
-      const response = await fetch('http://localhost:8001/api/auth/twitter/save-connection', {
+      const response = await fetch(`${apiBaseUrl}/api/auth/twitter/save-connection`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

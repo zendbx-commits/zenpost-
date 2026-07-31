@@ -38,7 +38,10 @@ const FacebookConnectionModal = ({ isOpen, onClose, onConnect, userId }) => {
       setLoading(true)
       setError(null)
 
-      const response = await fetch('http://localhost:8001/api/auth/facebook/initiate', {
+      // Use environment variable for API base URL
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_PUBLIC_API_BASE_URL || 'http://localhost:8001'
+
+      const response = await fetch(`${apiBaseUrl}/api/auth/facebook/initiate`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({user_id: userId})
@@ -81,7 +84,10 @@ const FacebookConnectionModal = ({ isOpen, onClose, onConnect, userId }) => {
       setLoading(true)
       setError(null)
 
-      const response = await fetch('http://localhost:8001/api/auth/facebook/save-connection', {
+      // Use environment variable for API base URL
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_PUBLIC_API_BASE_URL || 'http://localhost:8001'
+
+      const response = await fetch(`${apiBaseUrl}/api/auth/facebook/save-connection`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({

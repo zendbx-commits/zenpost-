@@ -19,8 +19,11 @@ const ThreadsConnectionModal = ({ isOpen, onClose, onConnect, userId }) => {
           setIsConnecting(true)
           setError(null)
           
+          // Use environment variable for API base URL
+          const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_PUBLIC_API_BASE_URL || 'http://localhost:8001'
+          
           // Save the connection to the database
-          const response = await fetch('http://localhost:8001/api/auth/threads/save-connection', {
+          const response = await fetch(`${apiBaseUrl}/api/auth/threads/save-connection`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -77,8 +80,11 @@ const ThreadsConnectionModal = ({ isOpen, onClose, onConnect, userId }) => {
       setIsConnecting(true)
       setError(null)
       
+      // Use environment variable for API base URL
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_PUBLIC_API_BASE_URL || 'http://localhost:8001'
+      
       // Step 1: Get authorization URL from backend
-      const response = await fetch('http://localhost:8001/api/auth/threads/initiate', {
+      const response = await fetch(`${apiBaseUrl}/api/auth/threads/initiate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

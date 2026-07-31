@@ -77,7 +77,10 @@ const TestInstagramPost = () => {
     setResult(null)
 
     try {
-      const response = await fetch('http://localhost:8001/api/instagram/post', {
+      // Use environment variable for API base URL
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_PUBLIC_API_BASE_URL || 'http://localhost:8001'
+
+      const response = await fetch(`${apiBaseUrl}/api/instagram/post`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
