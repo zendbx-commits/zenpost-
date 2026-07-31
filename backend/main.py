@@ -45,9 +45,14 @@ app = FastAPI(
 
 # CORS Configuration
 cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+
+# Add wildcard for development if not in production
+if os.getenv("ENVIRONMENT") != "production":
+    cors_origins.append("*")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins,
+    allow_origins=cors_origins if os.getenv("ENVIRONMENT") == "production" else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
