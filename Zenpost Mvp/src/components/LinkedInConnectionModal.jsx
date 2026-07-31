@@ -52,8 +52,11 @@ const LinkedInConnectionModal = ({ isOpen, onClose, onConnect, userId }) => {
       setLoading(true)
       setError(null)
 
+      // Use environment variable for API base URL
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_PUBLIC_API_BASE_URL || 'http://localhost:8001'
+
       // Call backend to get LinkedIn auth URL
-      const response = await fetch('http://localhost:8001/api/auth/linkedin/initiate', {
+      const response = await fetch(`${apiBaseUrl}/api/auth/linkedin/initiate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
