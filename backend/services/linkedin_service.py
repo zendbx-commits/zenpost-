@@ -26,13 +26,14 @@ class LinkedInService:
         self.api_base = "https://api.linkedin.com/v2"
         
         # Scopes for "Share on LinkedIn" product
+        # Note: w_organization_social requires Marketing Developer Platform approval
         self.scopes = [
             "openid",
             "profile",
             "email",
             "w_member_social",  # Post on behalf of user
-            "r_organization_social",  # Read organization data
-            "w_organization_social",  # Post on behalf of organization
+            # "r_organization_social",  # Requires approval
+            # "w_organization_social",  # Requires approval - for company pages
         ]
     
     def get_authorization_url(self, state: str) -> str:
