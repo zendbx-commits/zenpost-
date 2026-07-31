@@ -64,7 +64,26 @@ const InstagramConnectionModal = ({ isOpen, onClose, onConnect, userId }) => {
       setLoading(true)
       setError(null)
 
-      // Use environment variable for API base URL
+      // Open popup IMMEDIATELY (before async call) to avoid popup blocker
+      const width = 600
+      const height = 700
+      const left = window.screen.width / 2 - width / 2
+      const top = window.screen.height / 2 - height / 2
+      
+      // Open blank popup first (must be synchronous with click event)
+      const popup = window.open(
+        'about:blank',
+        'Instagram Authorization',
+        `width=${width},height=${height},left=${left},top=${top}`
+      )
+      
+      if (!popup) {
+        throw new Error('Popup was blocked. Please allow popups for this site.')
+      }
+      
+      setAuthWindow(popup)
+
+      // Now fetch the auth URL
       const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_PUBLIC_API_BASE_URL || 'http://localhost:8001'
 
       const response = await fetch(`${apiBaseUrl}/api/auth/instagram/initiate`, {
@@ -76,25 +95,19 @@ const InstagramConnectionModal = ({ isOpen, onClose, onConnect, userId }) => {
       const data = await response.json()
 
       if (data.success) {
-        const width = 600
-        const height = 700
-        const left = window.screen.width / 2 - width / 2
-        const top = window.screen.height / 2 - height / 2
-        
-        const popup = window.open(
-          data.auth_url,
-          'Instagram Authorization',
-          `width=${width},height=${height},left=${left},top=${top}`
-        )
-        
-        setAuthWindow(popup)
+        // Navigate the already-open popup to the auth URL
+        popup.location.href = data.auth_url
       } else {
+        popup.close()
         throw new Error(data.message || 'Failed to initiate Instagram auth')
       }
     } catch (err) {
       console.error('Instagram auth error:', err)
       setError(err.message)
       setLoading(false)
+      if (authWindow) {
+        authWindow.close()
+      }
     }
   }
 
