@@ -108,8 +108,11 @@ const LinkedInConnectionModal = ({ isOpen, onClose, onConnect, userId }) => {
       setLoading(true)
       setError(null)
 
+      // Use environment variable for API base URL
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_PUBLIC_API_BASE_URL || 'http://localhost:8001'
+
       // Save connections to backend
-      const response = await fetch('http://localhost:8001/api/auth/linkedin/save-connection', {
+      const response = await fetch(`${apiBaseUrl}/api/auth/linkedin/save-connection`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -157,8 +160,11 @@ const LinkedInConnectionModal = ({ isOpen, onClose, onConnect, userId }) => {
         throw new Error('Organization ID must be numeric (e.g., 12345678)')
       }
 
+      // Use environment variable for API base URL
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_PUBLIC_API_BASE_URL || 'http://localhost:8001'
+
       // Call backend to add company page manually
-      const response = await fetch('http://localhost:8001/api/auth/linkedin/add-company-manual', {
+      const response = await fetch(`${apiBaseUrl}/api/auth/linkedin/add-company-manual`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
