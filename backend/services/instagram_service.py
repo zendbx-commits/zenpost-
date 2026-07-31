@@ -30,6 +30,16 @@ class InstagramService:
         self.app_secret = os.getenv("INSTAGRAM_APP_SECRET")
         self.redirect_uri = os.getenv("INSTAGRAM_REDIRECT_URI")
         
+        # Log configuration for debugging
+        logger.info(f"Instagram Service initialized with App ID: {self.app_id[:4]}...{self.app_id[-4:] if self.app_id else 'NOT SET'}")
+        
+        if not self.app_id:
+            logger.error("❌ INSTAGRAM_APP_ID is not set in environment variables!")
+        if not self.app_secret:
+            logger.error("❌ INSTAGRAM_APP_SECRET is not set in environment variables!")
+        if not self.redirect_uri:
+            logger.error("❌ INSTAGRAM_REDIRECT_URI is not set in environment variables!")
+        
         # Facebook Graph API endpoints (Instagram uses Facebook infrastructure)
         self.auth_url = "https://www.facebook.com/v18.0/dialog/oauth"
         self.token_url = "https://graph.facebook.com/v18.0/oauth/access_token"
