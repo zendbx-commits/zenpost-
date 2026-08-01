@@ -324,12 +324,19 @@ class ImageGenerationService:
                 'file': (storage_path, png_data, 'image/png')
             }
             
-            async with httpx.AsyncClient(timeout=180.0) as client:  # Increased to 3 minutes
-                upload_response = await client.post(
-                    upload_url,
-                    headers=headers,
-                    files=files
-                )
+            async with httpx.AsyncClient(timeout=60.0) as client:  # Set to 60 seconds
+                try:
+                    upload_response = await client.post(
+                        upload_url,
+                        headers=headers,
+                        files=files
+                    )
+                except httpx.TimeoutException:
+                    logger.error("❌ ZendBX upload timeout after 60s - falling back to local storage")
+                    raise
+                except Exception as upload_error:
+                    logger.error(f"❌ ZendBX upload failed: {upload_error}")
+                    raise
             
             upload_time = time.time() - upload_start
             
@@ -428,14 +435,51 @@ class ImageGenerationService:
             logger.error(f"❌ Storage upload failed: {str(e)}")
             logger.exception("Full traceback:")
             
-            return {
-                "status": "error",
-                "error": "storage_error",
-                "message": f"Failed to upload to ZendBX Storage: {str(e)}",
-                "prompt": prompt,
-                "model": self.model,
-                "generation_time": f"{generation_time:.2f}s"
-            }
+            # FALLBACK: Save locally and continue
+            logger.info("🔄 Falling back to local storage...")
+            try:
+                local_dir = Path("generated_images")
+                local_dir.mkdir(exist_ok=True)
+                local_filename = f"{uuid.uuid4()}.png"
+                local_path = local_dir / local_filename
+                local_path.write_bytes(png_data)
+
+                port = os.getenv("PORT", "8001")
+                public_base = os.getenv(
+                    "PUBLIC_API_BASE_URL",
+                    os.getenv("API_BASE_URL", f"http://localhost:{port}")
+                ).rstrip("/")
+                public_image_url = f"{public_base}/generated-images/{local_filename}"
+                
+                logger.info(f"✅ Saved locally: {public_image_url}")
+                
+                # Base64 encode for JSON
+                image_bytes_base64 = base64.b64encode(png_data).decode('utf-8')
+                
+                return {
+                    "status": "completed",
+                    "prompt": prompt,
+                    "model": self.model,
+                    "provider": "stability_ai",
+                    "image_url": public_image_url,
+                    "public_image_url": public_image_url,
+                    "image_bytes": image_bytes_base64,
+                    "width": image.width,
+                    "height": image.height,
+                    "generation_time": f"{generation_time:.2f}s",
+                    "storage_warning": f"ZendBX upload failed, using local storage: {str(e)}"
+                }
+                
+            except Exception as local_error:
+                logger.error(f"❌ Local storage fallback also failed: {local_error}")
+                return {
+                    "status": "error",
+                    "error": "storage_error",
+                    "message": f"Both ZendBX and local storage failed: {str(e)}",
+                    "prompt": prompt,
+                    "model": self.model,
+                    "generation_time": f"{generation_time:.2f}s"
+                }
     
     def get_image_url(self, storage_path: str, file_id: Optional[str] = None) -> str:
         """
