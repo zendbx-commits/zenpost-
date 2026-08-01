@@ -364,8 +364,19 @@ class PostScheduler:
         posts_published = 0
         posts_waiting = 0
         
+        # Log current time for debugging
+        logger.info(f"🕐 Current UTC time: {now.isoformat()}")
+        logger.info(f"📋 Checking {len(posts_to_check)} scheduled post(s)")
+        
         for post in posts_to_check:
             scheduled_dt = post['scheduled_datetime']
+            
+            # Detailed time comparison logging
+            time_diff = (scheduled_dt - now).total_seconds()
+            logger.info(f"📌 Post {post['id'][:8]}...")
+            logger.info(f"   Scheduled for: {scheduled_dt.isoformat()}")
+            logger.info(f"   Time until publish: {time_diff:.0f} seconds ({time_diff/60:.1f} minutes)")
+            logger.info(f"   Should publish? {scheduled_dt <= now}")
             
             if scheduled_dt <= now:
                 logger.info(f"⏰ Publishing post: {post['id'][:8]}... to {post.get('platforms')}")
