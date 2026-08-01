@@ -14,9 +14,6 @@ export default function LinkedInPublishModal({ post, onClose, onPublished }) {
   const [generatedImage, setGeneratedImage] = useState(null);
   const [imageLoading, setImageLoading] = useState(false);
   const [imageError, setImageError] = useState(null);
-  const [availableModels, setAvailableModels] = useState([]);
-  const [selectedModel, setSelectedModel] = useState('pollinations');
-  const [modelsLoading, setModelsLoading] = useState(true);
   
   // Publishing
   const [publishing, setPublishing] = useState(false);
@@ -26,7 +23,6 @@ export default function LinkedInPublishModal({ post, onClose, onPublished }) {
   useEffect(() => {
     loadLinkedInAccounts();
     prepareContent();
-    loadImageModels();
   }, [post]);
 
   const loadLinkedInAccounts = async () => {
@@ -80,36 +76,6 @@ export default function LinkedInPublishModal({ post, onClose, onPublished }) {
     setEditedContent(content.trim());
   };
 
-  const loadImageModels = async () => {
-    try {
-      console.log('🎨 Loading image models...');
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'}/api/image-models`
-      );
-      
-      if (!response.ok) {
-        throw new Error('Failed to load image models');
-      }
-      
-      const data = await response.json();
-      console.log('📦 Image models loaded:', data);
-      
-      if (data.success && data.models) {
-        setAvailableModels(data.models);
-        // Set first enabled model as default
-        const firstEnabled = data.models.find(m => m.enabled);
-        if (firstEnabled) {
-          setSelectedModel(firstEnabled.id);
-          console.log('✅ Default model selected:', firstEnabled.name);
-        }
-      }
-    } catch (error) {
-      console.error('❌ Error loading image models:', error);
-    } finally {
-      setModelsLoading(false);
-    }
-  };
-
   const generateImage = async () => {
     if (!post.image_prompt) {
       setImageError('No image prompt available for this post');
@@ -128,7 +94,7 @@ export default function LinkedInPublishModal({ post, onClose, onPublished }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: selectedModel,
+            model: 'pollinations',
             prompt: post.image_prompt,
             style: 'realistic',
             aspect_ratio: '1:1',
@@ -353,33 +319,6 @@ export default function LinkedInPublishModal({ post, onClose, onPublished }) {
                     <p className="image-prompt-preview">
                       <strong>AI Prompt:</strong> {post.image_prompt}
                     </p>
-                    
-                    {/* AI Model Selector */}
-                    {!modelsLoading && availableModels.length > 0 && (
-                      <div className="model-selector">
-                        <label htmlFor="ai-model">AI Image Model</label>
-                        <select 
-                          id="ai-model"
-                          value={selectedModel}
-                          onChange={(e) => setSelectedModel(e.target.value)}
-                          className="form-select"
-                        >
-                          {availableModels.map(model => (
-                            <option 
-                              key={model.id} 
-                              value={model.id}
-                              disabled={!model.enabled}
-                            >
-                              {model.enabled ? '🟢' : '🔒'} {model.name} {model.badge && `(${model.badge})`}
-                              {model.coming_soon && ' - Coming Soon'}
-                            </option>
-                          ))}
-                        </select>
-                        <small style={{color: '#666', fontSize: '12px', marginTop: '5px', display: 'block'}}>
-                          Selected: {availableModels.find(m => m.id === selectedModel)?.name}
-                        </small>
-                      </div>
-                    )}
                     
                     <button 
                       className="btn btn-secondary"

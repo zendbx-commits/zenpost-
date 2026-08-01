@@ -23,8 +23,17 @@ export default function CreatePost() {
     content_pillar: ''
   });
 
+  // AI Image Generation
+  const [availableModels, setAvailableModels] = useState([]);
+  const [selectedModel, setSelectedModel] = useState('pollinations');
+  const [modelsLoading, setModelsLoading] = useState(true);
+  const [generatedImage, setGeneratedImage] = useState(null);
+  const [imageLoading, setImageLoading] = useState(false);
+  const [imageError, setImageError] = useState(null);
+
   useEffect(() => {
     checkAuth();
+    loadImageModels();
   }, []);
 
   const checkAuth = async () => {
@@ -37,6 +46,91 @@ export default function CreatePost() {
       console.error('Auth error:', error);
       navigate('/login');
     }
+  };
+
+  const loadImageModels = async () => {
+    try {
+      console.log('🎨 Loading image models...');
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001';
+      const response = await fetch(`${apiBaseUrl}/api/image-models`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to load image models');
+      }
+      
+      const data = await response.json();
+      console.log('📦 Image models loaded:', data);
+      
+      if (data.success && data.models) {
+        setAvailableModels(data.models);
+        // Set first enabled model as default
+        const firstEnabled = data.models.find(m => m.enabled);
+        if (firstEnabled) {
+          setSelectedModel(firstEnabled.id);
+          console.log('✅ Default model selected:', firstEnabled.name);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error loading image models:', error);
+    } finally {
+      setModelsLoading(false);
+    }
+  };
+
+  const generateImage = async () => {
+    if (!formData.image_prompt || !formData.image_prompt.trim()) {
+      setImageError('Please enter an image prompt first');
+      return;
+    }
+
+    setImageLoading(true);
+    setImageError(null);
+
+    try {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001';
+      const response = await fetch(`${apiBaseUrl}/api/images/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: selectedModel,
+          prompt: formData.image_prompt,
+          style: 'realistic',
+          aspect_ratio: '1:1',
+          quality: 'standard'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Image generation failed');
+      }
+
+      const data = await response.json();
+      console.log('✅ Image generated:', data);
+      console.log('📷 Image URL:', data.data.public_image_url || data.data.image_url);
+
+      if (data.success && data.data.status === 'completed') {
+        const imageUrl = data.data.public_image_url || data.data.image_url;
+        console.log('🖼️ Setting image URL:', imageUrl);
+        setGeneratedImage(imageUrl);
+        // Store the image URL in formData for scheduling
+        setFormData(prev => ({ ...prev, generated_image_url: imageUrl }));
+        console.log('✅ Image state updated');
+      } else {
+        throw new Error(data.data.error || 'Image generation failed');
+      }
+    } catch (error) {
+      console.error('❌ Image generation error:', error);
+      setImageError(error.message);
+    } finally {
+      setImageLoading(false);
+    }
+  };
+
+  const removeImage = () => {
+    setGeneratedImage(null);
+    setFormData(prev => ({ ...prev, generated_image_url: null }));
   };
 
   const handleChange = (e) => {
@@ -306,6 +400,98 @@ export default function CreatePost() {
                 rows="3"
               />
             </div>
+
+            {/* AI Model Selector */}
+            {!modelsLoading && availableModels.length > 0 && formData.image_prompt && (
+              <div className="form-section">
+                <label className="section-label">AI Image Model</label>
+                <select 
+                  value={selectedModel}
+                  onChange={(e) => setSelectedModel(e.target.value)}
+                  className="form-select"
+                >
+                  {availableModels.map(model => (
+                    <option 
+                      key={model.id} 
+                      value={model.id}
+                      disabled={!model.enabled}
+                    >
+                      {model.enabled ? '🟢' : '🔒'} {model.name} {model.badge && `(${model.badge})`}
+                      {model.coming_soon && ' - Coming Soon'}
+                    </option>
+                  ))}
+                </select>
+                <small className="form-hint">
+                  Selected: {availableModels.find(m => m.id === selectedModel)?.name}
+                </small>
+              </div>
+            )}
+
+            {/* Image Generation Button and Preview */}
+            {formData.image_prompt && (
+              <div className="form-section">
+                {generatedImage ? (
+                  <div className="image-preview-section">
+                    <label className="section-label">Generated Image</label>
+                    <div className="image-preview">
+                      <img 
+                        src={generatedImage} 
+                        alt="Generated" 
+                        onError={(e) => {
+                          console.error('❌ Image failed to load:', generatedImage);
+                          setImageError(`Failed to load image from: ${generatedImage}`);
+                        }}
+                        onLoad={() => {
+                          console.log('✅ Image loaded successfully:', generatedImage);
+                        }}
+                      />
+                      <div className="image-actions">
+                        <button 
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          onClick={generateImage}
+                          disabled={imageLoading}
+                        >
+                          {imageLoading ? 'Regenerating...' : '🔄 Regenerate'}
+                        </button>
+                        <button 
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          onClick={removeImage}
+                        >
+                          🗑️ Remove
+                        </button>
+                      </div>
+                    </div>
+                    <div style={{marginTop: '8px', fontSize: '12px', color: 'rgba(255,255,255,0.5)'}}>
+                      Image URL: {generatedImage}
+                    </div>
+                  </div>
+                ) : (
+                  <button 
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={generateImage}
+                    disabled={imageLoading || !formData.image_prompt.trim()}
+                  >
+                    {imageLoading ? (
+                      <>
+                        <span className="spinner"></span>
+                        Generating Image...
+                      </>
+                    ) : (
+                      '🎨 Generate Image with AI'
+                    )}
+                  </button>
+                )}
+                
+                {imageError && (
+                  <div className="error-message" style={{marginTop: '10px', color: '#dc3545', fontSize: '14px'}}>
+                    ⚠️ {imageError}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Submit Buttons */}
             <div className="form-actions">
