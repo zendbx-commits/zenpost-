@@ -94,15 +94,21 @@ const InstagramConnectionModal = ({ isOpen, onClose, onConnect, userId }) => {
 
       const data = await response.json()
 
+      console.log('✅ Instagram auth response:', data)
+
       if (data.success) {
+        console.log('✅ Navigating popup to:', data.auth_url)
         // Navigate the already-open popup to the auth URL
         popup.location.href = data.auth_url
+        console.log('✅ Popup navigation command executed')
       } else {
+        console.error('❌ Backend returned success:false')
         popup.close()
         throw new Error(data.message || 'Failed to initiate Instagram auth')
       }
     } catch (err) {
-      console.error('Instagram auth error:', err)
+      console.error('❌ Instagram auth error:', err)
+      console.error('❌ Error stack:', err.stack)
       setError(err.message)
       setLoading(false)
       if (authWindow) {
