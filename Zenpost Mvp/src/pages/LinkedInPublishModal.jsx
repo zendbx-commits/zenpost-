@@ -82,6 +82,7 @@ export default function LinkedInPublishModal({ post, onClose, onPublished }) {
 
   const loadImageModels = async () => {
     try {
+      console.log('🎨 Loading image models...');
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'}/api/image-models`
       );
@@ -91,6 +92,7 @@ export default function LinkedInPublishModal({ post, onClose, onPublished }) {
       }
       
       const data = await response.json();
+      console.log('📦 Image models loaded:', data);
       
       if (data.success && data.models) {
         setAvailableModels(data.models);
@@ -98,10 +100,11 @@ export default function LinkedInPublishModal({ post, onClose, onPublished }) {
         const firstEnabled = data.models.find(m => m.enabled);
         if (firstEnabled) {
           setSelectedModel(firstEnabled.id);
+          console.log('✅ Default model selected:', firstEnabled.name);
         }
       }
     } catch (error) {
-      console.error('Error loading image models:', error);
+      console.error('❌ Error loading image models:', error);
     } finally {
       setModelsLoading(false);
     }
@@ -372,6 +375,9 @@ export default function LinkedInPublishModal({ post, onClose, onPublished }) {
                             </option>
                           ))}
                         </select>
+                        <small style={{color: '#666', fontSize: '12px', marginTop: '5px', display: 'block'}}>
+                          Selected: {availableModels.find(m => m.id === selectedModel)?.name}
+                        </small>
                       </div>
                     )}
                     
