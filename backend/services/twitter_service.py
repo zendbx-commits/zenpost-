@@ -18,10 +18,11 @@ class TwitterService:
     
     def __init__(self):
         # OAuth 1.0a credentials (Consumer Keys)
-        self.api_key = os.getenv("TWITTER_API_KEY")
-        self.api_secret = os.getenv("TWITTER_API_SECRET")
-        self.bearer_token = os.getenv("TWITTER_BEARER_TOKEN")
-        self.callback_uri = os.getenv("TWITTER_CALLBACK_URI")
+        # Strip whitespace/newlines to prevent %0A in OAuth requests
+        self.api_key = (os.getenv("TWITTER_API_KEY") or "").strip()
+        self.api_secret = (os.getenv("TWITTER_API_SECRET") or "").strip()
+        self.bearer_token = (os.getenv("TWITTER_BEARER_TOKEN") or "").strip()
+        self.callback_uri = (os.getenv("TWITTER_CALLBACK_URI") or "").strip()
         
         # Twitter OAuth 1.0a endpoints
         self.request_token_url = "https://api.twitter.com/oauth/request_token"

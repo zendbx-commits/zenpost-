@@ -24,9 +24,10 @@ class ThreadsService:
     
     def __init__(self):
         # Threads uses the same app credentials as Instagram/Facebook
-        self.app_id = os.getenv("FACEBOOK_APP_ID")  # Same as Instagram
-        self.app_secret = os.getenv("FACEBOOK_APP_SECRET")
-        self.redirect_uri = os.getenv("THREADS_REDIRECT_URI", "http://localhost:8001/api/auth/threads/callback")
+        # Strip whitespace/newlines to prevent %0A in OAuth requests
+        self.app_id = (os.getenv("FACEBOOK_APP_ID") or "").strip()  # Same as Instagram
+        self.app_secret = (os.getenv("FACEBOOK_APP_SECRET") or "").strip()
+        self.redirect_uri = (os.getenv("THREADS_REDIRECT_URI") or "http://localhost:8001/api/auth/threads/callback").strip()
         
         # Threads API endpoints (uses Instagram Graph API)
         self.api_base = "https://graph.threads.net/v1.0"

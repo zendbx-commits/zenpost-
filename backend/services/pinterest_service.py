@@ -23,9 +23,10 @@ class PinterestService:
     """
     
     def __init__(self):
-        self.app_id = os.getenv("PINTEREST_APP_ID")
-        self.app_secret = os.getenv("PINTEREST_APP_SECRET")
-        self.redirect_uri = os.getenv("PINTEREST_REDIRECT_URI")
+        # Strip whitespace/newlines to prevent %0A in OAuth requests
+        self.app_id = (os.getenv("PINTEREST_APP_ID") or "").strip()
+        self.app_secret = (os.getenv("PINTEREST_APP_SECRET") or "").strip()
+        self.redirect_uri = (os.getenv("PINTEREST_REDIRECT_URI") or "").strip()
         
         # Pinterest API endpoints
         self.auth_url = "https://www.pinterest.com/oauth/"

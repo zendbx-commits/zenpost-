@@ -26,9 +26,10 @@ class InstagramService:
     
     def __init__(self):
         # Use Instagram app credentials (separate from Facebook)
-        self.app_id = os.getenv("INSTAGRAM_APP_ID")
-        self.app_secret = os.getenv("INSTAGRAM_APP_SECRET")
-        self.redirect_uri = os.getenv("INSTAGRAM_REDIRECT_URI")
+        # Strip whitespace/newlines to prevent %0A in OAuth requests
+        self.app_id = (os.getenv("INSTAGRAM_APP_ID") or "").strip()
+        self.app_secret = (os.getenv("INSTAGRAM_APP_SECRET") or "").strip()
+        self.redirect_uri = (os.getenv("INSTAGRAM_REDIRECT_URI") or "").strip()
         
         # Log configuration for debugging
         logger.info(f"Instagram Service initialized with App ID: {self.app_id[:4]}...{self.app_id[-4:] if self.app_id else 'NOT SET'}")

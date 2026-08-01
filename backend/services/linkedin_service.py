@@ -16,9 +16,10 @@ class LinkedInService:
     """Service for LinkedIn OAuth and API interactions"""
     
     def __init__(self):
-        self.client_id = os.getenv("LINKEDIN_CLIENT_ID")
-        self.client_secret = os.getenv("LINKEDIN_CLIENT_SECRET")
-        self.redirect_uri = os.getenv("LINKEDIN_REDIRECT_URI")
+        # Strip whitespace/newlines to prevent %0A in OAuth requests
+        self.client_id = (os.getenv("LINKEDIN_CLIENT_ID") or "").strip()
+        self.client_secret = (os.getenv("LINKEDIN_CLIENT_SECRET") or "").strip()
+        self.redirect_uri = (os.getenv("LINKEDIN_REDIRECT_URI") or "").strip()
         
         # LinkedIn OAuth endpoints
         self.auth_url = "https://www.linkedin.com/oauth/v2/authorization"
