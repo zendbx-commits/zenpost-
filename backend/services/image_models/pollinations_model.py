@@ -102,11 +102,17 @@ class PollinationsModel(BaseImageModel):
             local_path.write_bytes(image_bytes)
             
             # Generate public URL
-            port = os.getenv("PORT", "8001")
-            public_base = os.getenv(
-                "PUBLIC_API_BASE_URL",
-                os.getenv("API_BASE_URL", f"http://localhost:{port}")
-            ).rstrip("/")
+            # Check for production URL first, then fall back to localhost
+            public_base = os.getenv("RENDER_EXTERNAL_URL")
+            if not public_base:
+                public_base = os.getenv("PUBLIC_API_BASE_URL")
+            if not public_base:
+                public_base = os.getenv("API_BASE_URL")
+            if not public_base:
+                port = os.getenv("PORT", "8001")
+                public_base = f"http://localhost:{port}"
+            
+            public_base = public_base.rstrip("/")
             public_image_url = f"{public_base}/generated-images/{filename}"
             
             logger.info(f"✅ Image saved locally: {public_image_url}")

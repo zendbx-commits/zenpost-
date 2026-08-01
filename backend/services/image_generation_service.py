@@ -374,11 +374,17 @@ class ImageGenerationService:
                     local_path = local_dir / local_filename
                     local_path.write_bytes(png_data)
 
-                    port = os.getenv("PORT", "8001")
-                    public_base = os.getenv(
-                        "PUBLIC_API_BASE_URL",
-                        os.getenv("API_BASE_URL", f"http://localhost:{port}")
-                    ).rstrip("/")
+                    # Check for production URL first, then fall back to localhost
+                    public_base = os.getenv("RENDER_EXTERNAL_URL")
+                    if not public_base:
+                        public_base = os.getenv("PUBLIC_API_BASE_URL")
+                    if not public_base:
+                        public_base = os.getenv("API_BASE_URL")
+                    if not public_base:
+                        port = os.getenv("PORT", "8001")
+                        public_base = f"http://localhost:{port}"
+                    
+                    public_base = public_base.rstrip("/")
                     public_image_url = f"{public_base}/generated-images/{local_filename}"
                     logger.info(f"✓ Local public image URL: {public_image_url}")
                 except Exception as local_error:
@@ -444,11 +450,17 @@ class ImageGenerationService:
                 local_path = local_dir / local_filename
                 local_path.write_bytes(png_data)
 
-                port = os.getenv("PORT", "8001")
-                public_base = os.getenv(
-                    "PUBLIC_API_BASE_URL",
-                    os.getenv("API_BASE_URL", f"http://localhost:{port}")
-                ).rstrip("/")
+                # Check for production URL first, then fall back to localhost
+                public_base = os.getenv("RENDER_EXTERNAL_URL")
+                if not public_base:
+                    public_base = os.getenv("PUBLIC_API_BASE_URL")
+                if not public_base:
+                    public_base = os.getenv("API_BASE_URL")
+                if not public_base:
+                    port = os.getenv("PORT", "8001")
+                    public_base = f"http://localhost:{port}"
+                
+                public_base = public_base.rstrip("/")
                 public_image_url = f"{public_base}/generated-images/{local_filename}"
                 
                 logger.info(f"✅ Saved locally: {public_image_url}")
