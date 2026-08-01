@@ -309,6 +309,7 @@ class PostScheduler:
             try:
                 import httpx
                 async with httpx.AsyncClient() as client:
+                    # Only fetch posts with status 'scheduled' (not processing, published, or failed)
                     response = await client.get(
                         f"{zendbx_service.base_url}/scheduled_posts?status=eq.scheduled&order=scheduled_at.asc&select=*",
                         headers={"Range": "0-999", **zendbx_service.headers},
@@ -387,20 +388,25 @@ class PostScheduler:
             if scheduled_dt <= now:
                 logger.info(f"⏰ Publishing post: {post['id'][:8]}... to {post.get('platforms')}")
                 
-                posts_published += 1
-                
-                await self._post_to_platforms(post, zendbx_service)
-                
+                # IMMEDIATELY mark as processing to prevent double-posting
                 try:
                     async with httpx.AsyncClient() as client:
                         await client.patch(
                             f"{zendbx_service.base_url}/scheduled_posts?id=eq.{post['id']}",
                             headers=zendbx_service.headers,
-                            json={'status': 'completed', 'posted_at': now.isoformat()},
+                            json={'status': 'processing'},
                             timeout=30.0
                         )
+                    logger.info(f"   Status updated to 'processing'")
                 except Exception as update_error:
-                    logger.warning(f"Failed to update post status: {update_error}")
+                    logger.warning(f"Failed to mark as processing: {update_error}")
+                
+                posts_published += 1
+                
+                # Now post to platforms
+                await self._post_to_platforms(post, zendbx_service)
+                
+                # Final status update happens in _post_to_platforms (either 'published' or 'failed')
                 
             else:
                 posts_waiting += 1
