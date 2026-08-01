@@ -4079,6 +4079,39 @@ async def start_scheduler_endpoint():
         )
 
 
+@app.post("/api/scheduler/trigger")
+async def trigger_scheduler_check():
+    """
+    Manually trigger a single scheduler check cycle
+    This will check for and publish any posts that are due NOW
+    """
+    try:
+        logger.info("🔄 Manual scheduler trigger requested")
+        
+        # Run a single check cycle
+        await post_scheduler.check_and_post(zendbx_service)
+        
+        # Get stats
+        stats = post_scheduler.get_stats()
+        
+        logger.info("✅ Manual scheduler check completed")
+        
+        return {
+            "success": True,
+            "message": "Scheduler check completed",
+            "stats": stats
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to trigger scheduler: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to trigger scheduler: {str(e)}"
+        )
+
+
 @app.post("/api/scheduler/stop")
 async def stop_scheduler():
     """
