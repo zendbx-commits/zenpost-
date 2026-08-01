@@ -824,7 +824,7 @@ async def generate_image_with_model(request: dict):
         logger.info("=" * 60)
         
         # Extract parameters
-        model_id = request.get('model', 'stability')  # Default to stability
+        model_id = request.get('model', 'pollinations')  # Default to pollinations (free)
         prompt = request.get('prompt')
         style = request.get('style', 'realistic')
         aspect_ratio = request.get('aspect_ratio', '1:1')
