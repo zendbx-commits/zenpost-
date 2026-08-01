@@ -103,10 +103,16 @@ class PostScheduler:
             # Parse 24-hour format
             scheduled_datetime = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
         
-        # Add UTC timezone if naive
-        from datetime import timezone
+        # Treat input time as IST (UTC+5:30) and convert to UTC
+        from datetime import timezone, timedelta
+        ist = timezone(timedelta(hours=5, minutes=30))
+        
         if scheduled_datetime.tzinfo is None:
-            scheduled_datetime = scheduled_datetime.replace(tzinfo=timezone.utc)
+            # Attach IST timezone to the naive datetime
+            scheduled_datetime = scheduled_datetime.replace(tzinfo=ist)
+        
+        # Convert to UTC for storage
+        scheduled_datetime = scheduled_datetime.astimezone(timezone.utc)
         
         platforms = post_data.get('platforms', ['LinkedIn'])
         content = post_data.get('content', {})
