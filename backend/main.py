@@ -736,6 +736,161 @@ async def generate_content_calendar_endpoint(request: dict):
         )
 
 
+from services.image_model_registry import image_model_registry
+
+# ============================================================================
+# AI IMAGE MODEL ENDPOINTS
+# ============================================================================
+
+@app.get("/api/image-models")
+async def list_image_models():
+    """
+    List all available AI image generation models
+    
+    Response:
+    {
+        "success": true,
+        "models": [
+            {
+                "id": "pollinations",
+                "name": "Pollinations",
+                "badge": "Free",
+                "enabled": true
+            },
+            {
+                "id": "stability",
+                "name": "Stability AI",
+                "badge": "Free",
+                "enabled": true
+            },
+            {
+                "id": "flux",
+                "name": "FLUX",
+                "badge": "Premium",
+                "enabled": false,
+                "coming_soon": true
+            }
+        ]
+    }
+    """
+    try:
+        models = image_model_registry.list_models()
+        return {
+            "success": True,
+            "models": models
+        }
+    except Exception as e:
+        logger.error(f"Failed to list image models: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to list image models: {str(e)}"
+        )
+
+
+@app.post("/api/images/generate")
+async def generate_image_with_model(request: dict):
+    """
+    Generate an image using the specified AI model
+    
+    Request body:
+    {
+        "model": "pollinations",  // or "stability"
+        "prompt": "Nike Running Shoes",
+        "style": "realistic",  // optional
+        "aspect_ratio": "1:1",  // optional
+        "quality": "standard",  // optional
+        "user_id": "optional-user-id",
+        "campaign_id": "optional-campaign-id"
+    }
+    
+    Response:
+    {
+        "success": true,
+        "data": {
+            "status": "completed",
+            "prompt": "Enhanced prompt...",
+            "model": "pollinations",
+            "provider": "pollinations",
+            "image_url": "https://...",
+            "width": 1024,
+            "height": 1024,
+            "generation_time": "2.45s"
+        }
+    }
+    """
+    try:
+        logger.info("=" * 60)
+        logger.info("🎨 AI IMAGE GENERATION REQUEST")
+        logger.info("=" * 60)
+        
+        # Extract parameters
+        model_id = request.get('model', 'stability')  # Default to stability
+        prompt = request.get('prompt')
+        style = request.get('style', 'realistic')
+        aspect_ratio = request.get('aspect_ratio', '1:1')
+        quality = request.get('quality', 'standard')
+        user_id = request.get('user_id')
+        campaign_id = request.get('campaign_id')
+        
+        if not prompt:
+            raise HTTPException(
+                status_code=400,
+                detail="'prompt' is required in request body"
+            )
+        
+        logger.info(f"Model: {model_id}")
+        logger.info(f"Prompt: {prompt[:100]}...")
+        logger.info(f"Style: {style}")
+        logger.info(f"Aspect Ratio: {aspect_ratio}")
+        logger.info(f"Quality: {quality}")
+        
+        # Generate image using model registry
+        result = await image_model_registry.generate_image(
+            model_id=model_id,
+            prompt=prompt,
+            style=style,
+            aspect_ratio=aspect_ratio,
+            quality=quality,
+            user_id=user_id,
+            campaign_id=campaign_id
+        )
+        
+        logger.info("=" * 60)
+        if result.get('status') == 'completed':
+            logger.info("✅ IMAGE GENERATION COMPLETE")
+            logger.info(f"Model: {result.get('model')}")
+            logger.info(f"URL: {result.get('image_url')}")
+        else:
+            logger.info(f"⚠️ IMAGE GENERATION FAILED: {result.get('error')}")
+        logger.info("=" * 60)
+        
+        # Remove raw image_bytes from response (too large for JSON)
+        response_data = {k: v for k, v in result.items() if k != 'image_bytes'}
+        
+        return {
+            "success": result.get('status') == 'completed',
+            "data": response_data,
+            "message": "Image generated successfully" if result.get('status') == 'completed' else result.get('message', 'Image generation failed')
+        }
+        
+    except ValueError as ve:
+        # Model not found or not enabled
+        logger.error(f"Model error: {str(ve)}")
+        raise HTTPException(
+            status_code=400,
+            detail=str(ve)
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Image generation error: {str(e)}")
+        logger.exception("Full traceback:")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Image generation failed: {str(e)}"
+        )
+
+
 @app.post("/api/generate-image")
 async def generate_image(request: dict):
     """
